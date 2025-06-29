@@ -499,7 +499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c03503c03e8b4640a6f16bfd26b3246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneToLoad: MainMenu
+  sceneToLoad: GameBoard
   loadingBar: {fileID: 1515703372}
   loadingText: {fileID: 351436595}
 --- !u!4 &530831595
