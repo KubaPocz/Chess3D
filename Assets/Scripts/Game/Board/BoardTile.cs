@@ -1,10 +1,14 @@
-using UnityEngine;
+﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class BoardTile : MonoBehaviour
 {
     public Vector2Int GridPosition { get; private set; }
     public ChessColor Color { get; private set; }
     public string TileName { get; private set; }
+    public ChessPiece CurrentPiece { get; private set; }
 
     public void Init(int x, int z, Renderer renderer, ChessColor color, Material material)
     {
@@ -15,12 +19,30 @@ public class BoardTile : MonoBehaviour
         int rank = z + 1;
 
         TileName = $"{file}{rank}";
+        CurrentPiece = null;
+
         gameObject.name = $"Tile_{TileName}";
 
         renderer.material = material;
     }
+    public void SetPiece(ChessPiece piece)
+    {
+        CurrentPiece = piece;
+    }
     private void OnMouseDown()
     {
-        Debug.Log($"Klikni�to pole: {TileName}");
+#if UNITY_EDITOR
+        // Wyczyść konsolę
+        var logEntries = System.Type.GetType("UnityEditor.LogEntries,UnityEditor.dll");
+        var clearMethod = logEntries?.GetMethod("Clear", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+        clearMethod?.Invoke(null, null);
+#endif
+
+        Debug.Log($"{CurrentPiece.PieceType}");
+
+        foreach (BoardTile tile in CurrentPiece.GetAvailableMoves())
+        {
+            Debug.Log($"→ {tile.TileName}");
+        }
     }
 }
