@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Pawn : ChessPiece
 {
-
+    public override void SetPieceType() => PieceType = PieceType.Pawn;
     public override List<BoardTile> GetAvailableMoves()
     {
         List<BoardTile> moves = new();

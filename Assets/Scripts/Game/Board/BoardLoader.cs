@@ -88,11 +88,11 @@ public class BoardLoader : MonoBehaviour
     }
     void SpawnPiece(GameObject piecePrefab,ChessColor color, int x, int y)
     {
-        GameObject pieceObj = Instantiate(piecePrefab);
+        GameObject pieceObj = Instantiate(piecePrefab,piecesParent.transform);
         ChessPiece piece = pieceObj.GetComponent<ChessPiece>();
 
         BoardTile tile = tiles[x,y];
-        piece.Initialize(color, tile, tiles, piece.PieceType, BoardManager);
+        piece.Initialize(color, tile, tiles, BoardManager);
         tile.SetPiece(piece);
 
         BoardManager.allPieces.Add(piece);

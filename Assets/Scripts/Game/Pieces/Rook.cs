@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Rook : ChessPiece
 {
+    public override void SetPieceType() => PieceType = PieceType.Rook;
+
     public override List<BoardTile> GetAvailableMoves()
     {
         List<BoardTile> moves = new();

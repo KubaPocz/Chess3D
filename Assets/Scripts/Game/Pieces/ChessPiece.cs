@@ -6,16 +6,17 @@ abstract public class ChessPiece : MonoBehaviour
     public ChessColor Color { get; private set; }
     public BoardTile CurrentTile { get; private set; }
     protected BoardTile[,] Board;
-    public PieceType PieceType { get; private set; }
+    public PieceType PieceType { get; protected set; }
     public BoardManager BoardManager { get; private set; }
-    public void Initialize(ChessColor color, BoardTile startTile, BoardTile[,] board, PieceType pieceType, BoardManager boardManager)
+    public void Initialize(ChessColor color, BoardTile startTile, BoardTile[,] board, BoardManager boardManager)
     {
         Color = color;
         CurrentTile = startTile;
         Board = board;
         transform.position = startTile.transform.position;
-        PieceType = pieceType;
+        SetPieceType();
         BoardManager = boardManager;
+        name = Color.ToString() + "_" + GetComponent<ChessPiece>().PieceType.ToString();
         RotatePiece();
         ApplyColor();
     }
@@ -31,6 +32,7 @@ abstract public class ChessPiece : MonoBehaviour
             transform.rotation *= Quaternion.Euler(0,180,0);
     }
     public abstract List<BoardTile> GetAvailableMoves();
+    public abstract void SetPieceType();
     protected bool IsInsideBoard(int x, int z) => x >= 0 && z >= 0 && x < 8 && z < 8;
     protected bool IsEmpty(int x, int z)
     {
@@ -51,4 +53,5 @@ abstract public class ChessPiece : MonoBehaviour
         ChessPiece piece = Board[x, z].CurrentPiece;
         return piece!= null && piece.Color == this.Color;
     }
+
 }

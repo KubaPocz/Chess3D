@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class King:ChessPiece
 {
+    public override void SetPieceType() => PieceType = PieceType.King;
     public override List<BoardTile> GetAvailableMoves()
     {
         List<BoardTile> moves = new();
