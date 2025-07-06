@@ -1,13 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 abstract public class ChessPiece : MonoBehaviour
 {
+    public bool HasMoved = false;
     public ChessColor Color { get; private set; }
     public BoardTile CurrentTile { get; private set; }
     protected BoardTile[,] Board;
     public PieceType PieceType { get; protected set; }
     public BoardManager BoardManager { get; private set; }
+    public static event System.Action<List<BoardTile>,ChessPiece> OnAnyPieceClicked;
     public void Initialize(ChessColor color, BoardTile startTile, BoardTile[,] board, BoardManager boardManager)
     {
         Color = color;
@@ -53,5 +56,30 @@ abstract public class ChessPiece : MonoBehaviour
         ChessPiece piece = Board[x, z].CurrentPiece;
         return piece!= null && piece.Color == this.Color;
     }
+    public void OnMouseDown()
+    {
+        if (!BoardManager.GameManager.IsCurrentTurn(Color))
+            return;
+        OnAnyPieceClicked?.Invoke(GetAvailableMoves(),this);
+    }
+    public void MovePiece(BoardTile targetTile)
+    {
+        CurrentTile = null;
 
+        if(targetTile.CurrentPiece != null)
+        {
+            ChessPiece target = targetTile.CurrentPiece;
+            BoardManager.allPieces.Remove(target);
+            Destroy(target.gameObject);
+        }
+
+        targetTile.SetPiece(this);
+        CurrentTile = targetTile;
+
+        transform.position = targetTile.transform.position;
+
+        HasMoved = true;
+
+        BoardManager.GameManager.OnMoveCompleted();
+    }
 }

@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour
 {
-    [SerializeField] private GameManager GameManager;
+    [SerializeField] public GameManager GameManager;
     [SerializeField] public Material White;
     [SerializeField] public Material Black;
     public BoardTile[,] GameBoard { get; private set; }
     public List<ChessPiece> allPieces = new();
-
     public List<BoardTile> GetAllAttackedTiles(ChessColor byColor)
     {
         List<BoardTile> attackedTiles = new();
