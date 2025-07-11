@@ -4,8 +4,7 @@ using UnityEngine;
 public class Knight : ChessPiece
 {
     public override void SetPieceType() => PieceType = PieceType.Knight;
-
-    public override List<BoardTile> GetAvailableMoves()
+    public override List<BoardTile> GetAvailableMoves(bool includeIllegal = false)
     {
         List<BoardTile> moves = new();
 

@@ -9,7 +9,6 @@ public class BoardTile : MonoBehaviour
     public ChessColor Color { get; private set; }
     public string TileName { get; private set; }
     public ChessPiece CurrentPiece { get; private set; }
-
     public void Init(int x, int z, Renderer renderer, ChessColor color, Material material)
     {
         GridPosition = new Vector2Int(x, z);
@@ -28,21 +27,5 @@ public class BoardTile : MonoBehaviour
     public void SetPiece(ChessPiece piece)
     {
         CurrentPiece = piece;
-    }
-    private void OnMouseDown()
-    {
-#if UNITY_EDITOR
-        // Wyczyść konsolę
-        var logEntries = System.Type.GetType("UnityEditor.LogEntries,UnityEditor.dll");
-        var clearMethod = logEntries?.GetMethod("Clear", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        clearMethod?.Invoke(null, null);
-#endif
-
-        Debug.Log($"{CurrentPiece.PieceType}");
-
-        foreach (BoardTile tile in CurrentPiece.GetAvailableMoves())
-        {
-            Debug.Log($"→ {tile.TileName}");
-        }
     }
 }

@@ -345,6 +345,52 @@ MonoBehaviour:
   White: {fileID: 2100000, guid: 9f005e058794b684e880034064409cd2, type: 2}
   Black: {fileID: 2100000, guid: 5a97f92fe45cae54fbbc0fcd0c37784c, type: 2}
   allPieces: []
+--- !u!1 &970862494
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 970862496}
+  - component: {fileID: 970862495}
+  m_Layer: 0
+  m_Name: MoveHighlighter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &970862495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970862494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cd5c55bd32794b40b37f142cd9f00d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileMoveHighlighter: {fileID: 3587194734925325103, guid: 84a2f4f47b2548846a98a5d47564d30b, type: 3}
+  tileKillHighlighter: {fileID: 3999136723160428386, guid: e1da8f3f1792f4d4fb8c7adb0ebaa2df, type: 3}
+--- !u!4 &970862496
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970862494}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.05057883, y: -0.058172606, z: -0.017654333}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1233321406
 GameObject:
   m_ObjectHideFlags: 0
@@ -596,3 +642,4 @@ SceneRoots:
   - {fileID: 315040279}
   - {fileID: 904560939}
   - {fileID: 2114567896}
+  - {fileID: 970862496}
