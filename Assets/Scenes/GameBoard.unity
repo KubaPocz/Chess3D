@@ -374,7 +374,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd5c55bd32794b40b37f142cd9f00d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileHighlighter: {fileID: 3587194734925325103, guid: 84a2f4f47b2548846a98a5d47564d30b, type: 3}
+  tileMoveHighlighter: {fileID: 3587194734925325103, guid: 84a2f4f47b2548846a98a5d47564d30b, type: 3}
+  tileKillHighlighter: {fileID: 3999136723160428386, guid: e1da8f3f1792f4d4fb8c7adb0ebaa2df, type: 3}
 --- !u!4 &970862496
 Transform:
   m_ObjectHideFlags: 0

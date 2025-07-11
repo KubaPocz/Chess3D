@@ -1,10 +1,11 @@
+using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bishop:ChessPiece
+public class Bishop : ChessPiece
 {
     public override void SetPieceType() => PieceType = PieceType.Bishop;
-    public override List<BoardTile> GetAvailableMoves()
+    public override List<BoardTile> GetAvailableMoves(bool includeIllegal = false)
     {
         List<BoardTile> moves = new();
 

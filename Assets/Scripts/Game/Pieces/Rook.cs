@@ -5,7 +5,7 @@ public class Rook : ChessPiece
 {
     public override void SetPieceType() => PieceType = PieceType.Rook;
 
-    public override List<BoardTile> GetAvailableMoves()
+    public override List<BoardTile> GetAvailableMoves(bool includeIllegal = false)
     {
         List<BoardTile> moves = new();
 
@@ -34,6 +34,7 @@ public class Rook : ChessPiece
                 }
                 else
                     break;
+
                 x += direction.x;
                 y += direction.y;
             }

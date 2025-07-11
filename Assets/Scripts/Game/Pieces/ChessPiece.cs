@@ -34,7 +34,7 @@ abstract public class ChessPiece : MonoBehaviour
         if(Color==ChessColor.Black)
             transform.rotation *= Quaternion.Euler(0,180,0);
     }
-    public abstract List<BoardTile> GetAvailableMoves();
+    public abstract List<BoardTile> GetAvailableMoves(bool includeIllegal = false);
     public abstract void SetPieceType();
     protected bool IsInsideBoard(int x, int z) => x >= 0 && z >= 0 && x < 8 && z < 8;
     protected bool IsEmpty(int x, int z)
@@ -60,11 +60,14 @@ abstract public class ChessPiece : MonoBehaviour
     {
         if (!BoardManager.GameManager.IsCurrentTurn(Color))
             return;
-        OnAnyPieceClicked?.Invoke(GetAvailableMoves(),this);
+        OnAnyPieceClicked?.Invoke(GetAvailableMoves(), this);
     }
     public void MovePiece(BoardTile targetTile)
     {
-        CurrentTile = null;
+        if (CurrentTile != null)
+        {
+            CurrentTile.SetPiece(null);
+        }
 
         if(targetTile.CurrentPiece != null)
         {

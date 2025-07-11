@@ -15,7 +15,7 @@ public class BoardManager : MonoBehaviour
         foreach (ChessPiece piece in allPieces)
         {
             if (piece.Color == byColor) continue;
-            attackedTiles.AddRange(piece.GetAvailableMoves());
+            attackedTiles.AddRange(piece.GetAvailableMoves(true));
         }
         return attackedTiles.Distinct().ToList();
     }

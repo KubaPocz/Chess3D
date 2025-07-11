@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Queen:ChessPiece
+public class Queen : ChessPiece
 {
     public override void SetPieceType() => PieceType = PieceType.Queen;
-    public override List<BoardTile> GetAvailableMoves()
+    public override List<BoardTile> GetAvailableMoves(bool includeIllegal = false)
     {
         List<BoardTile> moves = new();
 

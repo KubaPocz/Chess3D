@@ -5,7 +5,8 @@ using UnityEngine;
 public class MoveHighlighter : MonoBehaviour
 {
     public static MoveHighlighter Instance { get; private set; }
-    [SerializeField] private GameObject tileHighlighter;
+    [SerializeField] private GameObject tileMoveHighlighter;
+    [SerializeField] private GameObject tileKillHighlighter;
     private List<GameObject> tileHighlighters = new ();
     private ChessPiece selectedPiece;
     private void Awake()
@@ -31,7 +32,11 @@ public class MoveHighlighter : MonoBehaviour
         selectedPiece = piece;
         foreach (BoardTile tile in tiles)
         {
-            GameObject marker = Instantiate(tileHighlighter, tile.transform.position, Quaternion.identity);
+            GameObject marker;
+            if (tile.CurrentPiece != null && tile.CurrentPiece.Color != piece.Color)
+                marker = Instantiate(tileKillHighlighter, tile.transform.position, Quaternion.identity);
+            else
+                marker = Instantiate(tileMoveHighlighter, tile.transform.position, Quaternion.identity);
             marker.GetComponent<MoveMarker>().Init(tile, piece);
             tileHighlighters.Add(marker);
         }

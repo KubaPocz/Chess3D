@@ -50,7 +50,7 @@ public class BoardLoader : MonoBehaviour
 
     void SpawnAllPieces()
     {
-        for(int x = 0; x < 8; x++)
+        for (int x = 0; x < 8; x++)
         {
             SpawnPiece(pawnPrefab, ChessColor.White, x, 1);
             SpawnPiece(pawnPrefab, ChessColor.Black, x, 6);
