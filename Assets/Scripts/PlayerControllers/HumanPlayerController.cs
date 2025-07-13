@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class HumanPlayerController : MonoBehaviour, IPlayerController
 {
+    public ChessColor PlayerColor { get; private set; }
     public void StartTurn()
     {
         enabled = true;
@@ -9,6 +10,10 @@ public class HumanPlayerController : MonoBehaviour, IPlayerController
     public void EndTurn()
     {
         enabled = false;
+    }
+    public void Initialize(ChessColor playerColor)
+    {
+        PlayerColor = playerColor;
     }
 
     void Start()

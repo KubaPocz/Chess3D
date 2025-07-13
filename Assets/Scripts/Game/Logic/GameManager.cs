@@ -4,13 +4,14 @@ using static Codice.CM.Common.CmCallContext;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+
     private IPlayerController whitePlayer;
     private IPlayerController blackPlayer;
 
-    public IPlayerController CurrentPlayer { get; private set; }
-    public IPlayerController WaitingPlayer => (CurrentPlayer == whitePlayer) ? blackPlayer : whitePlayer;
-
+    public IPlayerController CurrentPlayer;
     public ChessColor CurrentTurnColor { get; private set; }
+    public IPlayerController WaitingPlayer => (CurrentPlayer == whitePlayer) ? blackPlayer : whitePlayer;
+    
     private void Awake()
     {
         if(Instance != null && Instance != this)
@@ -20,10 +21,13 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
     }
-    public void StartGame(IPlayerController white, IPlayerController black)
+    public void AssignPlayers(IPlayerController white, IPlayerController black)
     {
         whitePlayer = white;
         blackPlayer = black;
+    }
+    public void StartGame()
+    {
         CurrentPlayer = whitePlayer;
         CurrentTurnColor = ChessColor.White;
 
