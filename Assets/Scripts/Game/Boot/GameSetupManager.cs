@@ -4,10 +4,11 @@ public class GameSetupManager : MonoBehaviour
 {
     public GameObject humanPrefab;
     public GameObject botPrefab;
+
+    public IPlayerController player1 { get; private set; }
+    public IPlayerController player2 { get; private set; }
     private void Start()
     {
-        IPlayerController player1;
-        IPlayerController player2;
         switch (GameConfigStore.CurrentConfig.GameMode)
         {
             case (GameMode.HumanVsHuman):
@@ -25,8 +26,5 @@ public class GameSetupManager : MonoBehaviour
         ChessColor player2Color = GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White ? ChessColor.Black : ChessColor.White;
         player1.Initialize(player1Color);
         player2.Initialize(player2Color);
-
-        GameManager.Instance.AssignPlayers(player1, player2);
-        GameManager.Instance.StartGame();
     }
 }

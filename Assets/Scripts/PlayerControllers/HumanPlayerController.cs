@@ -15,14 +15,4 @@ public class HumanPlayerController : MonoBehaviour, IPlayerController
     {
         PlayerColor = playerColor;
     }
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
 }
