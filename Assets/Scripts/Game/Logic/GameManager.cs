@@ -21,6 +21,12 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
     }
+    private void Start()
+    {
+        var setup = FindAnyObjectByType<GameSetupManager>();
+        AssignPlayers(setup.player1, setup.player2);
+        StartGame();
+    }
     public void AssignPlayers(IPlayerController white, IPlayerController black)
     {
         whitePlayer = white;
