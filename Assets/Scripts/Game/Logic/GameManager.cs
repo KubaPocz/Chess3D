@@ -42,11 +42,11 @@ public class GameManager : MonoBehaviour
 
     public void OnMoveCompleted()
     {
-        //CurrentPlayer.EndTurn();
+        CurrentPlayer.EndTurn();
 
         SwitchTurn();
 
-        //CurrentPlayer.StartTurn();
+        CurrentPlayer.StartTurn();
     }
 
     private void SwitchTurn()

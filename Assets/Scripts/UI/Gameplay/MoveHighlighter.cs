@@ -20,11 +20,11 @@ public class MoveHighlighter : MonoBehaviour
     }
     private void OnEnable()
     {
-        ChessPiece.OnAnyPieceClicked += HighlightTiles;
+        GameEvents.OnHighlightRequested += HighlightTiles;
     }
     private void OnDisable()
     {
-        ChessPiece.OnAnyPieceClicked -= HighlightTiles;
+        GameEvents.OnHighlightRequested -= HighlightTiles;
     }
     private void HighlightTiles(List<BoardTile> tiles,ChessPiece piece)
     {
