@@ -13,8 +13,6 @@ public class BoardLoader : MonoBehaviour
     [SerializeField] private GameObject bishopPrefab;
     [SerializeField] private GameObject queenPrefab;
     [SerializeField] private GameObject kingPrefab;
-    [Header("BoardManager")]
-    [SerializeField] private BoardManager BoardManager;
 
     private Material White;
     private Material Black;
@@ -22,12 +20,12 @@ public class BoardLoader : MonoBehaviour
 
     void Start()
     {
-        White = BoardManager.White;
-        Black = BoardManager.Black;
+        White = BoardManager.Instance.White;
+        Black = BoardManager.Instance.Black;
         GenerateBoard();
         SpawnAllPieces();
 
-        BoardManager.SetGameBoard(tiles);
+        BoardManager.Instance.SetGameBoard(tiles);
     }
 
     void GenerateBoard()
@@ -92,9 +90,9 @@ public class BoardLoader : MonoBehaviour
         ChessPiece piece = pieceObj.GetComponent<ChessPiece>();
 
         BoardTile tile = tiles[x,y];
-        piece.Initialize(color, tile, tiles, BoardManager);
+        piece.Initialize(color, tile, tiles);
         tile.SetPiece(piece);
 
-        BoardManager.allPieces.Add(piece);
+        BoardManager.Instance.allPieces.Add(piece);
     }
 }
