@@ -8,7 +8,7 @@ public class StockfishEngine
     public void StartEngine()
     {
         process = new Process();
-        process.StartInfo.FileName = Application.streamingAssetsPath + "/AI/strockfish.exe";
+        process.StartInfo.FileName = Application.streamingAssetsPath + "/AI/stockfish.exe";
         process.StartInfo.RedirectStandardInput = true;
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.UseShellExecute = false;
@@ -47,6 +47,12 @@ public class StockfishEngine
     }
     private void SendCommand(string command)
     {
+        UnityEngine.Debug.Log("-> " + command);
+        if (process == null || process.HasExited)
+        {
+            UnityEngine.Debug.LogError("Stockfish process is not running.");
+            return;
+        }
         process.StandardInput.WriteLine(command);
         process.StandardInput.Flush();
     }

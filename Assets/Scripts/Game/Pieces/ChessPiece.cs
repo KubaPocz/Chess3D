@@ -8,16 +8,14 @@ abstract public class ChessPiece : MonoBehaviour
     public BoardTile CurrentTile { get; private set; }
     protected BoardTile[,] Board;
     public PieceType PieceType { get; protected set; }
-    public BoardManager BoardManager { get; private set; }
     public static event System.Action<List<BoardTile>,ChessPiece> OnAnyPieceClicked;
-    public void Initialize(ChessColor color, BoardTile startTile, BoardTile[,] board, BoardManager boardManager)
+    public void Initialize(ChessColor color, BoardTile startTile, BoardTile[,] board)
     {
         Color = color;
         CurrentTile = startTile;
         Board = board;
         transform.position = startTile.transform.position;
         SetPieceType();
-        BoardManager = boardManager;
         name = Color.ToString() + "_" + GetComponent<ChessPiece>().PieceType.ToString();
         RotatePiece();
         ApplyColor();
@@ -26,7 +24,7 @@ abstract public class ChessPiece : MonoBehaviour
     protected void ApplyColor()
     {
         Renderer renderer = GetComponent<Renderer>();
-        renderer.material = (Color==ChessColor.White)?BoardManager.White:BoardManager.Black;
+        renderer.material = (Color==ChessColor.White)?BoardManager.Instance.White:BoardManager.Instance.Black;
     }
     private void RotatePiece()
     {
@@ -57,7 +55,7 @@ abstract public class ChessPiece : MonoBehaviour
     }
     public void OnMouseDown()
     {
-        if (!BoardManager.GameManager.IsCurrentTurn(Color))
+        if (!GameManager.Instance.IsCurrentTurn(Color))
             return;
         OnAnyPieceClicked?.Invoke(GetAvailableMoves(), this);
     }
@@ -71,7 +69,7 @@ abstract public class ChessPiece : MonoBehaviour
         if(targetTile.CurrentPiece != null)
         {
             ChessPiece target = targetTile.CurrentPiece;
-            BoardManager.allPieces.Remove(target);
+            BoardManager.Instance.allPieces.Remove(target);
             Destroy(target.gameObject);
         }
 
@@ -82,6 +80,6 @@ abstract public class ChessPiece : MonoBehaviour
 
         HasMoved = true;
 
-        BoardManager.GameManager.OnMoveCompleted();
+        GameManager.Instance.OnMoveCompleted();
     }
 }

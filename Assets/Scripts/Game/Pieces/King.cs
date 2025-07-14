@@ -18,7 +18,7 @@ public class King:ChessPiece
 
                 if (IsEmpty(x, y) || IsEnemy(x, y))
                 {
-                    if (includeIllegal || !BoardManager.IsTileUnderAttack(Board[x, y], Color))
+                    if (includeIllegal || !BoardManager.Instance.IsTileUnderAttack(Board[x, y], Color))
                         moves.Add(Board[x, y]);
                 }
             }

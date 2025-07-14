@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         CurrentPlayer = whitePlayer;
+        blackPlayer.EndTurn();
         CurrentTurnColor = ChessColor.White;
 
         CurrentPlayer.StartTurn();
