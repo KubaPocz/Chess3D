@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -5,10 +6,13 @@ using UnityEngine;
 public class BoardManager : MonoBehaviour
 {
     public static BoardManager Instance;
-    [SerializeField] public Material White;
-    [SerializeField] public Material Black;
+    [SerializeField] public Material tileWhite;
+    [SerializeField] public Material tileBlack;
+
+    [SerializeField] public Material pieceWhite;
+    [SerializeField] public Material pieceBlack;
     public BoardTile[,] GameBoard { get; private set; }
-    public List<ChessPiece> allPieces = new();
+    [NonSerialized] public List<ChessPiece> allPieces = new();
     private void Awake()
     {
         if (Instance != null && Instance != this)

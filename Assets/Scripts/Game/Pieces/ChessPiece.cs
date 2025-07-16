@@ -24,7 +24,7 @@ abstract public class ChessPiece : MonoBehaviour
     protected void ApplyColor()
     {
         Renderer renderer = GetComponent<Renderer>();
-        renderer.material = (Color==ChessColor.White)?BoardManager.Instance.White:BoardManager.Instance.Black;
+        renderer.material = (Color==ChessColor.White)?BoardManager.Instance.pieceWhite:BoardManager.Instance.pieceBlack;
     }
     private void RotatePiece()
     {
