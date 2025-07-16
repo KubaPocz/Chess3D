@@ -2,9 +2,13 @@ using UnityEngine;
 
 public class BoardLoader : MonoBehaviour
 {
+    [Header("Board frame")]
+    [SerializeField] private GameObject boardFrame;
+
     [Header("Tiles")]
     [SerializeField] private GameObject tilesParent;
     [SerializeField] private GameObject prefabTile;
+
     [Header("Pieces")]
     [SerializeField] private GameObject piecesParent;
     [SerializeField] private GameObject pawnPrefab;
@@ -14,20 +18,23 @@ public class BoardLoader : MonoBehaviour
     [SerializeField] private GameObject queenPrefab;
     [SerializeField] private GameObject kingPrefab;
 
-    private Material White;
-    private Material Black;
+    private Material tileWhite;
+    private Material tileBlack;
     private BoardTile[,] tiles = new BoardTile[8, 8];
 
     void Start()
     {
-        White = BoardManager.Instance.White;
-        Black = BoardManager.Instance.Black;
+        tileWhite = BoardManager.Instance.tileWhite;
+        tileBlack = BoardManager.Instance.tileBlack;
         GenerateBoard();
         SpawnAllPieces();
-
+        SpawnFrame();
         BoardManager.Instance.SetGameBoard(tiles);
     }
-
+    void SpawnFrame()
+    {
+        Instantiate(boardFrame,new Vector3(0,0,0), Quaternion.identity,tilesParent.transform);
+    }
     void GenerateBoard()
     {
         for (int x = 0; x < 8; x++)
@@ -39,7 +46,7 @@ public class BoardLoader : MonoBehaviour
                 Renderer tile_Renderer = tile.GetComponent<Renderer>();
                 BoardTile tile_boardTile = tile.GetComponent<BoardTile>();
                 ChessColor color = (x + z) % 2 == 1 ? ChessColor.White : ChessColor.Black;
-                Material material = (x + z) % 2 == 1 ? White : Black;
+                Material material = (x + z) % 2 == 1 ? tileWhite : tileBlack;
                 tile_boardTile.Init(x, z, tile_Renderer, color, material);
                 tiles[x,z] = tile_boardTile;
             }

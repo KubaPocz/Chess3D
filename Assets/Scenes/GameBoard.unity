@@ -284,16 +284,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4d3eefe76c4df441ab75c27266fb1a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boardFrame: {fileID: 2494198865798385063, guid: 80c40a0924ae8bf4e91965999eb2c52a, type: 3}
   tilesParent: {fileID: 1377561162}
-  prefabTile: {fileID: 3845378028035863739, guid: 5570379263836cd46af632ed81a001cb, type: 3}
+  prefabTile: {fileID: 2870481886864086620, guid: c365599e15171ab47a844a49d318f949, type: 3}
   piecesParent: {fileID: 1233321406}
-  pawnPrefab: {fileID: 3064927743264011186, guid: 358498a3dace0bc4fbc901cff24e89f2, type: 3}
-  rookPrefab: {fileID: 4932467513471315365, guid: 79c45aceb3224fe40b94ab36df5248b2, type: 3}
-  knightPrefab: {fileID: 684151319489379173, guid: fb8055d5ef9a0c54da4921e3bed611a9, type: 3}
-  bishopPrefab: {fileID: 5050461712309444178, guid: 61c291d0534d09e4fa91d936cec1c740, type: 3}
-  queenPrefab: {fileID: 3920540198235342572, guid: ec351f0bd5bb5ae49a80d5acc96a19a0, type: 3}
-  kingPrefab: {fileID: 3791452527660615924, guid: cf4dba834c93a4e4f9ef936ce49dbc59, type: 3}
-  BoardManager: {fileID: 904560940}
+  pawnPrefab: {fileID: 2789066852317973586, guid: c56af81b718498a4596e6ec41e889d79, type: 3}
+  rookPrefab: {fileID: 4056867887469942989, guid: 6d07dce4f7bad0848ac2386e01e373d0, type: 3}
+  knightPrefab: {fileID: 6217930742211613897, guid: f89f5e24fcca1bd4aaa3e349a3de3e68, type: 3}
+  bishopPrefab: {fileID: 6257016140288071675, guid: d5800a74f97717f4d9207bf170442685, type: 3}
+  queenPrefab: {fileID: 2683312752300803778, guid: 7c20bc5c67cb9614bae68f6b6b8c4a20, type: 3}
+  kingPrefab: {fileID: 4797772446467941061, guid: 89271d0ca0757e94b9ce22c05d859994, type: 3}
 --- !u!1 &904560938
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,10 +341,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61429aabcc553d04aa61d244b2129f58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameManager: {fileID: 2114567895}
-  White: {fileID: 2100000, guid: 9f005e058794b684e880034064409cd2, type: 2}
-  Black: {fileID: 2100000, guid: 5a97f92fe45cae54fbbc0fcd0c37784c, type: 2}
-  allPieces: []
+  tileWhite: {fileID: 2100000, guid: 1fea6bce6c9966b4b88adb0e6181706c, type: 2}
+  tileBlack: {fileID: 2100000, guid: 6a88b888cfb395142885ddddbdda0f42, type: 2}
+  pieceWhite: {fileID: 2100000, guid: 5006e7649a4c53e468ca4eb7c4537e1c, type: 2}
+  pieceBlack: {fileID: 2100000, guid: 8307fb37f5181e447a538009bc403c42, type: 2}
 --- !u!1 &970862494
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,7 +586,7 @@ Transform:
   m_GameObject: {fileID: 1847113085}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 4, y: 7, z: -1}
+  m_LocalPosition: {x: 3.5, y: 6.87, z: -1.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
