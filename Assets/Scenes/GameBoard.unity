@@ -293,7 +293,6 @@ MonoBehaviour:
   bishopPrefab: {fileID: 5050461712309444178, guid: 61c291d0534d09e4fa91d936cec1c740, type: 3}
   queenPrefab: {fileID: 3920540198235342572, guid: ec351f0bd5bb5ae49a80d5acc96a19a0, type: 3}
   kingPrefab: {fileID: 3791452527660615924, guid: cf4dba834c93a4e4f9ef936ce49dbc59, type: 3}
-  BoardManager: {fileID: 904560940}
 --- !u!1 &904560938
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,7 +340,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61429aabcc553d04aa61d244b2129f58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameManager: {fileID: 2114567895}
   White: {fileID: 2100000, guid: 9f005e058794b684e880034064409cd2, type: 2}
   Black: {fileID: 2100000, guid: 5a97f92fe45cae54fbbc0fcd0c37784c, type: 2}
   allPieces: []
