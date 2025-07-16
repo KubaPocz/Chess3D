@@ -34,7 +34,7 @@ public class MoveHighlighter : MonoBehaviour
         {
             GameObject marker;
             if (tile.CurrentPiece != null && tile.CurrentPiece.Color != piece.Color)
-                marker = Instantiate(tileKillHighlighter, tile.transform.position, Quaternion.identity);
+                marker = Instantiate(tileKillHighlighter, tile.transform.position+new Vector3(0,0.01f,0), Quaternion.identity);
             else
                 marker = Instantiate(tileMoveHighlighter, tile.transform.position, Quaternion.identity);
             marker.GetComponent<MoveMarker>().Init(tile, piece);

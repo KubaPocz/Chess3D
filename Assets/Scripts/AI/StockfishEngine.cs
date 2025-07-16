@@ -56,14 +56,4 @@ public class StockfishEngine
         process.StandardInput.WriteLine(command);
         process.StandardInput.Flush();
     }
-
-    private void WaitFor(string keyword)
-    {
-        string line;
-        while((line=process.StandardOutput.ReadLine()) != null)
-        {
-            if (line.Contains(keyword))
-                return;
-        }
-    }
 }
