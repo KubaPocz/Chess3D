@@ -6,9 +6,19 @@ using UnityEngine.UI;
 
 public class SceneLoader : MonoBehaviour
 {
+    public static SceneLoader Instance;
     public static string SceneToLoad;
     private static ILoadingUI loadingUI;
     private void Awake()
+    {
+        if(Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+    private void Start()
     {
         StartCoroutine(LoadSceneAsync(SceneToLoad));
     }
@@ -20,11 +30,11 @@ public class SceneLoader : MonoBehaviour
     {
         loadingUI?.UpdateProgress(progress);
     }
-    private IEnumerator LoadSceneAsync(string targetScene)
+    private IEnumerator LoadSceneAsync(string SceneToLoad)
     {
         yield return null;
 
-        AsyncOperation asyncLoading = SceneManager.LoadSceneAsync(targetScene);
+        AsyncOperation asyncLoading = SceneManager.LoadSceneAsync(SceneToLoad);
         asyncLoading.allowSceneActivation = false;
         
         while (asyncLoading.progress<0.9f)

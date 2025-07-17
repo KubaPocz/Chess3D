@@ -24,6 +24,7 @@ public class GameSetupManager : MonoBehaviour
         }
         ChessColor player1Color = GameConfigStore.CurrentConfig.PlayerColor;
         ChessColor player2Color = GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White ? ChessColor.Black : ChessColor.White;
+
         player1.Initialize(player1Color);
         player2.Initialize(player2Color);
     }

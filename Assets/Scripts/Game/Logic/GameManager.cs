@@ -7,7 +7,6 @@ public class GameManager : MonoBehaviour
 
     private IPlayerController whitePlayer;
     private IPlayerController blackPlayer;
-
     public IPlayerController CurrentPlayer;
     public ChessColor CurrentTurnColor { get; private set; }
     public IPlayerController WaitingPlayer => (CurrentPlayer == whitePlayer) ? blackPlayer : whitePlayer;
@@ -24,7 +23,16 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         var setup = FindAnyObjectByType<GameSetupManager>();
-        AssignPlayers(setup.player1, setup.player2);
+        ChessColor player1Color = GameConfigStore.CurrentConfig.PlayerColor;
+
+        if (player1Color == ChessColor.White)
+        {
+            AssignPlayers(setup.player1, setup.player2);
+        }
+        else
+        {
+            AssignPlayers(setup.player2, setup.player1);
+        }
         StartGame();
     }
     public void AssignPlayers(IPlayerController white, IPlayerController black)
