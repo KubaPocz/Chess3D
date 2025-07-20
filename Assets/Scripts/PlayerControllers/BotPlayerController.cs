@@ -22,7 +22,7 @@ public class BotPlayerController : MonoBehaviour, IPlayerController
         PlayerColor = playerColor;
         stockfish = new StockfishEngine();
         stockfish.StartEngine();
-        stockfish.SetSkillLevel(5);
+        stockfish.SetSkillLevel(GameConfigStore.CurrentConfig.Difficulty);
     }
     private void ApplyMove(string uci)
     {
