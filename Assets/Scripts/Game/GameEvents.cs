@@ -11,6 +11,8 @@ public static class GameEvents
     public static event Action<Animator,Animator> OnHidePanelRequested;
     public static event Action<ChessColor> OnColorChangeRequested;
     public static event Action<int> OnGameDifficultyChangeRequested;
+    public static event Action OnChangeTurnRequested;
+    public static event Action OnAddPlayerMoveRequested;
     //public static event Action<ChessColor,float> OnStartGameOfflineRequested;
     
     public static void RequestHighlights(List<BoardTile> tiles, ChessPiece piece)
@@ -36,5 +38,13 @@ public static class GameEvents
     public static void RequestChangeGameDifficulty(int difficulty)
     {
         OnGameDifficultyChangeRequested?.Invoke(difficulty);
+    }
+    public static void RequestChangeTurn()
+    {
+        OnChangeTurnRequested?.Invoke();
+    }
+    public static void RequestAddPlayerMove()
+    {
+        OnAddPlayerMoveRequested?.Invoke();
     }
 }

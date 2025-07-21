@@ -44,7 +44,6 @@ public class GameManager : MonoBehaviour
     {
         CurrentPlayer = whitePlayer;
         blackPlayer.EndTurn();
-        CurrentTurnColor = ChessColor.White;
 
         CurrentPlayer.StartTurn();
     }
@@ -61,9 +60,9 @@ public class GameManager : MonoBehaviour
     private void SwitchTurn()
     {
         CurrentPlayer = (CurrentPlayer == whitePlayer) ? blackPlayer : whitePlayer;
-        CurrentTurnColor = (CurrentTurnColor==ChessColor.White)? ChessColor.Black: ChessColor.White;
-        Debug.Log("Kolej gracza: "+ CurrentTurnColor);
+        GameEvents.RequestChangeTurn();
+        Debug.Log("Kolej gracza: "+ GameStats.Instance.currentTurnColor);
     }
 
-    public bool IsCurrentTurn(ChessColor color) => color == CurrentTurnColor;
+    public bool IsCurrentTurn(ChessColor color) => color == GameStats.Instance.currentTurnColor;
 }

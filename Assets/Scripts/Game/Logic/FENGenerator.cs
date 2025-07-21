@@ -31,7 +31,7 @@ public static class FENGenerator
             if (rank > 0)
                 fen += "/";
         }
-        string turn = GameManager.Instance.CurrentTurnColor == ChessColor.White ? "w" : "b";
+        string turn = GameStats.Instance.currentTurnColor == ChessColor.White ? "w" : "b";
         fen += $" {turn} - - 0 1";
         return fen;
     }

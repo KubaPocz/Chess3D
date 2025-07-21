@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameSetupManager : MonoBehaviour
 {
@@ -14,10 +15,12 @@ public class GameSetupManager : MonoBehaviour
             case (GameMode.HumanVsHuman):
                 player1 = Instantiate(humanPrefab).GetComponent<IPlayerController>();
                 player2 = Instantiate(humanPrefab).GetComponent<IPlayerController>();
+                SceneManager.LoadScene("UI_Online", LoadSceneMode.Additive);
                 break;
             case (GameMode.HumanVsBot):
                 player1 = Instantiate(humanPrefab).GetComponent<IPlayerController>();
                 player2 = Instantiate(botPrefab).GetComponent<IPlayerController>();
+                SceneManager.LoadScene("UI_Offline", LoadSceneMode.Additive);
                 break;
             default:
                 throw new System.Exception("Unsupported game mode.");
