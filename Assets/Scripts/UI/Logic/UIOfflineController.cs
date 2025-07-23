@@ -1,20 +1,53 @@
 using TMPro;
 using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIOfflineController : MonoBehaviour
 {
+    [Header("InGamePanel")]
+    [SerializeField] private GameObject Panel;
     [SerializeField] private TextMeshProUGUI TurnLabel;
     [SerializeField] private TextMeshProUGUI MovesLabel;
     [SerializeField] private TextMeshProUGUI CapturedLabel;
     [SerializeField] private TextMeshProUGUI DifficultyLabel;
     [SerializeField] private TextMeshProUGUI TimerLabel;
+    [Header("InGameMenu")]
+    [SerializeField] private GameObject MenuPanel;
+    [SerializeField] private Button RestartGameButton;
+    [SerializeField] private Button SurrenderGameButton;
+    [SerializeField] private Button ExitGameButton;
+    [Header("InfoLabel")]
+    [SerializeField] private TextMeshProUGUI CheckLabel;
     void Start()
     {
         GameEvents.OnChangeTurnRequested += UpdateTurnLabel;
         GameEvents.OnAddPlayerMoveRequested += UpdateMovesCountLabel;
+        GameEvents.OnPauseGameRequested += PauseGame;
+        GameEvents.OnRestartGameRequested += RestartGame;
+
+        RestartGameButton.onClick.AddListener(() => GameEvents.RequestRestartGame());
+        SurrenderGameButton.onClick.AddListener(() => GameEvents.RequestSurrenderGame());
+        ExitGameButton.onClick.AddListener(() => GameEvents.RequestExitGame());
+
+        Panel.SetActive(true);
+        MenuPanel.SetActive(false);
 
         BootLabels();
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameEvents.RequestPauseGame();
+        }
+    }
+    private void OnDestroy()
+    {
+        GameEvents.OnChangeTurnRequested -= UpdateTurnLabel;
+        GameEvents.OnAddPlayerMoveRequested -= UpdateMovesCountLabel;
+        GameEvents.OnPauseGameRequested -= PauseGame;
+        GameEvents.OnRestartGameRequested -= RestartGame;
     }
     private void BootLabels()
     {
@@ -48,11 +81,20 @@ public class UIOfflineController : MonoBehaviour
     {
         if (GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White)
             MovesLabel.text = GameStats.Instance.whiteMoves.ToString();
-        else 
+        else
             MovesLabel.text = GameStats.Instance.blackMoves.ToString();
     }
     private void UpdateTimerLabel()
     {
 
+    }
+    private void PauseGame()
+    {
+        Panel.SetActive(!Panel.activeInHierarchy);
+        MenuPanel.SetActive(!MenuPanel.activeInHierarchy);
+    }
+    private void RestartGame()
+    {
+        GameEvents.RequestStartGameOffline(GameConfigStore.CurrentConfig.PlayerColor, GameConfigStore.CurrentConfig.Difficulty);
     }
 }

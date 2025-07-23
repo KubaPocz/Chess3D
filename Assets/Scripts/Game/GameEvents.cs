@@ -13,6 +13,11 @@ public static class GameEvents
     public static event Action<int> OnGameDifficultyChangeRequested;
     public static event Action OnChangeTurnRequested;
     public static event Action OnAddPlayerMoveRequested;
+    public static event Action OnPauseGameRequested;
+    public static event Action OnRestartGameRequested;
+    public static event Action OnSurrenderGameRequested;
+    public static event Action OnExitGameRequested;
+    public static event Action<GameResult,GameResultReason> OnGameEnds;
     //public static event Action<ChessColor,float> OnStartGameOfflineRequested;
     
     public static void RequestHighlights(List<BoardTile> tiles, ChessPiece piece)
@@ -46,5 +51,26 @@ public static class GameEvents
     public static void RequestAddPlayerMove()
     {
         OnAddPlayerMoveRequested?.Invoke();
+    }
+    public static void RequestPauseGame()
+    {
+        OnPauseGameRequested?.Invoke();
+    }
+    public static void RequestRestartGame()
+    {
+        OnRestartGameRequested?.Invoke();
+    }
+    public static void RequestSurrenderGame()
+    {
+        //OnSurrenderGameRequested?.Invoke();
+        OnExitGameRequested?.Invoke();
+    }
+    public static void RequestExitGame()
+    {
+        OnExitGameRequested?.Invoke();
+    }
+    public static void RequestEndGame(GameResult gameResult, GameResultReason gameResultReason)
+    {
+        OnGameEnds?.Invoke(gameResult,gameResultReason);
     }
 }

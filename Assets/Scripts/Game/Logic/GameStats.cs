@@ -5,7 +5,7 @@ public class GameStats : MonoBehaviour
     public static GameStats Instance;
     public int whiteMoves {  get; private set; }
     public int blackMoves { get; private set; }
-    public ChessColor currentTurnColor {  get; private set; }
+    public ChessColor currentTurnColor {  get; set; }
     public float whiteTime {  get; private set; }
     public float blackTime {  get; private set; }
 

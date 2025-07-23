@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using static Codice.CM.Common.CmCallContext;
 
 public class GameManager : MonoBehaviour
@@ -7,13 +8,15 @@ public class GameManager : MonoBehaviour
 
     private IPlayerController whitePlayer;
     private IPlayerController blackPlayer;
-    public IPlayerController CurrentPlayer;
-    public ChessColor CurrentTurnColor { get; private set; }
+    public IPlayerController CurrentPlayer
+    {
+        get => GameStats.Instance.currentTurnColor == ChessColor.White ? whitePlayer : blackPlayer;
+    }
     public IPlayerController WaitingPlayer => (CurrentPlayer == whitePlayer) ? blackPlayer : whitePlayer;
-    
+
     private void Awake()
     {
-        if(Instance != null && Instance != this)
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
@@ -22,7 +25,14 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
-        var setup = FindAnyObjectByType<GameSetupManager>();
+        Debug.Log($"[GameManager.Start] player1 = {GameSetupManager.Instance?.player1}");
+        Debug.Log($"[GameManager.Start] player2 = {GameSetupManager.Instance?.player2}");
+
+        GameEvents.OnPauseGameRequested += PasueGame;
+        GameEvents.OnExitGameRequested += ExitGame;
+
+        var setup = GameSetupManager.Instance;
+
         ChessColor player1Color = GameConfigStore.CurrentConfig.PlayerColor;
 
         if (player1Color == ChessColor.White)
@@ -33,7 +43,17 @@ public class GameManager : MonoBehaviour
         {
             AssignPlayers(setup.player2, setup.player1);
         }
+        Debug.Log($"{whitePlayer.ToString()}, {blackPlayer.ToString()}");
         StartGame();
+    }
+    private void OnDestroy()
+    {
+        GameEvents.OnPauseGameRequested -= PasueGame;
+        GameEvents.OnExitGameRequested -= ExitGame;
+
+        Instance = null;
+        whitePlayer = null;
+        blackPlayer = null;
     }
     public void AssignPlayers(IPlayerController white, IPlayerController black)
     {
@@ -42,7 +62,6 @@ public class GameManager : MonoBehaviour
     }
     public void StartGame()
     {
-        CurrentPlayer = whitePlayer;
         blackPlayer.EndTurn();
 
         CurrentPlayer.StartTurn();
@@ -55,14 +74,48 @@ public class GameManager : MonoBehaviour
         SwitchTurn();
 
         CurrentPlayer.StartTurn();
+        Debug.Log("onmovecompleted");
     }
 
     private void SwitchTurn()
     {
-        CurrentPlayer = (CurrentPlayer == whitePlayer) ? blackPlayer : whitePlayer;
         GameEvents.RequestChangeTurn();
-        Debug.Log("Kolej gracza: "+ GameStats.Instance.currentTurnColor);
+        Debug.Log("Kolej gracza: " + GameStats.Instance.currentTurnColor);
+    }
+    public bool IsCurrentTurn(ChessColor color) => color == GameStats.Instance.currentTurnColor;
+    private void PasueGame()
+    {
+        var player = CurrentPlayer as MonoBehaviour;
+
+        if (player == null)
+        {
+            Debug.LogWarning("❌ PauseGame: CurrentPlayer is null or destroyed.");
+            return;
+        }
+
+        if (player.gameObject == null || !player.gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning("❌ PauseGame: CurrentPlayer's GameObject is inactive or destroyed.");
+            return;
+        }
+
+        player.enabled = !player.enabled;
+        Debug.Log($"[PauseGame] Toggled player.enabled = {player.enabled}");
     }
 
-    public bool IsCurrentTurn(ChessColor color) => color == GameStats.Instance.currentTurnColor;
+    private void ExitGame()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance.gameObject);
+        }
+        if (GameSetupManager.Instance != null)
+        {
+            Destroy(GameSetupManager.Instance.gameObject);
+        }
+
+        SceneLoader.SceneToLoad = "MainMenu";
+        SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
+    }
+
 }
