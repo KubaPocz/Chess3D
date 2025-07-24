@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class BotPlayerController : MonoBehaviour, IPlayerController
@@ -11,10 +12,11 @@ public class BotPlayerController : MonoBehaviour, IPlayerController
         string bestmove = stockfish.GetBestMove(fen);
 
         if (bestmove != null)
-            ApplyMove(bestmove);
+            StartCoroutine(ApplyMove(bestmove));
     }
     public void EndTurn()
     {
+        GameEvents.RequestAddPlayerMove();
         enabled = false;
     }
     public void Initialize(ChessColor playerColor)
@@ -24,8 +26,9 @@ public class BotPlayerController : MonoBehaviour, IPlayerController
         stockfish.StartEngine();
         stockfish.SetSkillLevel(GameConfigStore.CurrentConfig.Difficulty);
     }
-    private void ApplyMove(string uci)
+    private IEnumerator ApplyMove(string uci)
     {
+        yield return new WaitForSecondsRealtime(Random.Range(1f, 4f));
         var from = UCIHelper.ToBoardTile(uci.Substring(0, 2));
         var to = UCIHelper.ToBoardTile(uci.Substring(2, 2));
 
