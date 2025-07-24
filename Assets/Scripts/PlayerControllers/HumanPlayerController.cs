@@ -14,6 +14,7 @@ public class HumanPlayerController : MonoBehaviour, IPlayerController
     }
     public void EndTurn()
     {
+        GameEvents.RequestAddPlayerMove();
         enabled = false;
     }
     public void Initialize(ChessColor playerColor)
