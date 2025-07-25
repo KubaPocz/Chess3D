@@ -1,5 +1,7 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 public class MainMenuController : MonoBehaviour
 {
@@ -30,6 +32,14 @@ public class MainMenuController : MonoBehaviour
 
     [Header("OnlineLobbyPanel")]
     [SerializeField] Animator OnlineLobbyPanelAnimator;
+    [SerializeField] TextMeshProUGUI HostName;
+    [SerializeField] TextMeshProUGUI ClientName;
+    [SerializeField] Button LeaveLobbyButton;
+
+    [Header("LobbyHostElements")]
+    [SerializeField] TextMeshProUGUI LobbyCode;
+    [SerializeField] Button KickClientButton;
+    [SerializeField] Button StartGameButton;
 
     private ChessColor playerColor;
     private int gameDifficulty;
@@ -51,14 +61,20 @@ public class MainMenuController : MonoBehaviour
         BackToPlayPanelButtonOffline.onClick.AddListener(() => GameEvents.RequestHidePanel(OfflinePlayPanelAnimator, PlayPanelAnimator));
 
         //OnlinePanel
-        //HostOnlineGameButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, OnlineLobbyPanelAnimator));
+        HostOnlineGameButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, OnlineLobbyPanelAnimator));
         JoinLobbyButton.onClick.AddListener(() => ShowJoinSection());
         //ConfirmJoiningLobbyButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlineLobbyPanelAnimator, OnlineLobbyPanelAnimator));
         BackToPlayPanelButtonOnline.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, PlayPanelAnimator));
+        
+        //LobbyPanel
+        LeaveLobbyButton.onClick?.AddListener(() => GameEvents.RequestHidePanel(OnlineLobbyPanelAnimator,PlayPanelAnimator));
+        //kick
+        //startgame
 
         PlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
         OfflinePlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
         OnlinePlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
+        OnlineLobbyPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
         JoinLobbySection.SetActive(false);
     }
     private void OnEnable()
