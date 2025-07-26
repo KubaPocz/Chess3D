@@ -1,6 +1,3 @@
-using Codice.Client.Common.GameUI;
-using Mono.Cecil.Cil;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +5,6 @@ using UnityEngine.XR;
 
 public class MainMenuController : MonoBehaviour
 {
-    public static MainMenuController Instance { get; private set; }
     [Header("MainPanel")]
     [SerializeField] Animator MainPanelAnimator;
     [SerializeField] Button PlayButton;
@@ -31,7 +27,6 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] Button HostOnlineGameButton;
     [SerializeField] Button JoinLobbyButton;
     [SerializeField] GameObject JoinLobbySection;
-    [SerializeField] TMP_InputField LobbyCodeInput;
     [SerializeField] Button ConfirmJoiningLobbyButton;
     [SerializeField] Button BackToPlayPanelButtonOnline;
 
@@ -48,20 +43,9 @@ public class MainMenuController : MonoBehaviour
 
     private ChessColor playerColor;
     private int gameDifficulty;
-
-    private Dictionary<string, string> lobbyInfo = new Dictionary<string, string>();
-    private void Awake()
-    {
-        if(Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
     private void Start()
     {
-        PlayButton.onClick.AddListener(() => GameEvents.RequestHidePanel(MainPanelAnimator, PlayPanelAnimator));
+        PlayButton.onClick.AddListener(() => GameEvents.RequestHidePanel(MainPanelAnimator,PlayPanelAnimator));
         //do zmiany panele
         OptionsButton.onClick.AddListener(() => GameEvents.RequestHidePanel(MainPanelAnimator, PlayPanelAnimator));
         ExitButton.onClick.AddListener(() => GameEvents.RequestHidePanel(MainPanelAnimator, PlayPanelAnimator));
@@ -77,24 +61,15 @@ public class MainMenuController : MonoBehaviour
         BackToPlayPanelButtonOffline.onClick.AddListener(() => GameEvents.RequestHidePanel(OfflinePlayPanelAnimator, PlayPanelAnimator));
 
         //OnlinePanel
-        HostOnlineGameButton.onClick.AddListener(() => {GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, OnlineLobbyPanelAnimator); GameEvents.RequestCreateLobby(); });
+        HostOnlineGameButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, OnlineLobbyPanelAnimator));
         JoinLobbyButton.onClick.AddListener(() => ShowJoinSection());
-        ConfirmJoiningLobbyButton.onClick.AddListener(() =>
-        {
-            string code = LobbyCodeInput.text.Trim().ToUpper();
-            if (!string.IsNullOrEmpty(code))
-            {
-                Debug.Log(code);
-                GameEvents.RequestHidePanel(OnlineLobbyPanelAnimator, OnlineLobbyPanelAnimator);
-                GameEvents.RequestJoinLobby(code);
-            }
-        }); 
-        BackToPlayPanelButtonOnline.onClick.AddListener(() => { GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, PlayPanelAnimator); GameEvents.RequestLeaveLobby(); });
+        //ConfirmJoiningLobbyButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlineLobbyPanelAnimator, OnlineLobbyPanelAnimator));
+        BackToPlayPanelButtonOnline.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, PlayPanelAnimator));
         
         //LobbyPanel
-        LeaveLobbyButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlineLobbyPanelAnimator,PlayPanelAnimator));
-        KickClientButton.onClick.AddListener(() => GameEvents.RequestKickClient());
-        StartGameButton.onClick.AddListener(() => GameEvents.RequestStartGameOnline());
+        LeaveLobbyButton.onClick?.AddListener(() => GameEvents.RequestHidePanel(OnlineLobbyPanelAnimator,PlayPanelAnimator));
+        //kick
+        //startgame
 
         PlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
         OfflinePlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
@@ -107,14 +82,12 @@ public class MainMenuController : MonoBehaviour
         GameEvents.OnHidePanelRequested += HidePanel;
         GameEvents.OnColorChangeRequested += SetPlayerColor;
         GameEvents.OnGameDifficultyChangeRequested += SetGameDifficulty;
-        GameEvents.OnLobbyCodeUpdateRequested += UpdateLobbyCodeLabel;
     }
     private void OnDisable()
     {
         GameEvents.OnHidePanelRequested -= HidePanel;
         GameEvents.OnColorChangeRequested -= SetPlayerColor;
         GameEvents.OnGameDifficultyChangeRequested -= SetGameDifficulty;
-        GameEvents.OnLobbyCodeUpdateRequested -= UpdateLobbyCodeLabel;
     }
     private void HidePanel(Animator panelHide, Animator panelShow)
     {
@@ -134,10 +107,5 @@ public class MainMenuController : MonoBehaviour
     private void ShowJoinSection()
     {
         JoinLobbySection.SetActive(true);
-    }
-    private void UpdateLobbyCodeLabel(string code)
-    {
-        LobbyCode.text = code;
-        lobbyInfo.Add("code", code);
     }
 }

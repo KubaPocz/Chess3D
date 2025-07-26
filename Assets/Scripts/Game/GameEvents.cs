@@ -18,17 +18,8 @@ public static class GameEvents
     public static event Action OnSurrenderGameRequested;
     public static event Action OnExitGameRequested;
     public static event Action<GameResult,GameResultReason> OnGameEnds;
-    public static event Action OnCreateLobbyRequested;
-    public static event Action OnRefreshLobbyRequested;
-    public static event Action<string> OnJoinLobbyRequested;
-    public static event Action OnKickClientRequested;
-    public static event Action OnStartGameOnlineRequested;
-    public static event Action OnLeaveLobbyRequested;
-    public static event Action<string> OnLobbyCodeUpdateRequested;
-    public static event Action OnLobbyCloseRequested;
-    public static event Action<string> OnLobbyJoinedRequested;
-
-
+    //public static event Action<ChessColor,float> OnStartGameOfflineRequested;
+    
     public static void RequestHighlights(List<BoardTile> tiles, ChessPiece piece)
     {
         OnHighlightRequested?.Invoke(tiles, piece);
@@ -81,43 +72,5 @@ public static class GameEvents
     public static void RequestEndGame(GameResult gameResult, GameResultReason gameResultReason)
     {
         OnGameEnds?.Invoke(gameResult,gameResultReason);
-    }
-    public static void RequestCreateLobby()
-    {
-        OnCreateLobbyRequested?.Invoke();
-    }
-    public static void RequestRefreshLobby()
-    {
-        OnRefreshLobbyRequested?.Invoke();
-    }
-    public static void RequestJoinLobby(string code)
-    {
-        OnJoinLobbyRequested?.Invoke(code);
-    }
-    public static void RequestKickClient()
-    {
-        OnKickClientRequested?.Invoke();
-        OnRefreshLobbyRequested?.Invoke();
-    }
-    public static void RequestStartGameOnline()
-    {
-        OnStartGameOnlineRequested?.Invoke();
-    }
-    public static void RequestLeaveLobby()
-    {
-        OnLeaveLobbyRequested?.Invoke();
-        OnRefreshLobbyRequested?.Invoke();
-    }
-    public static void RequestUpdateLobbyCode(string code)
-    {
-        OnLobbyCodeUpdateRequested?.Invoke(code);
-    }
-    public static void RequestCloseLobby()
-    {
-        OnLobbyCloseRequested?.Invoke();
-    }
-    public static void RequestLobbyJoined(string playerName)
-    {
-        OnLobbyJoinedRequested?.Invoke(playerName);
     }
 }
