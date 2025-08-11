@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using Button = UnityEngine.UI.Button;
+using UnityEngine.UIElements;
 using UnityEngine.XR;
 
 public class MainMenuController : MonoBehaviour
@@ -22,24 +23,30 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] Button StartGameOfflineButton;
     [SerializeField] Button BackToPlayPanelButtonOffline;
 
+    [Header("ProfileCreationPanel")]
+    [SerializeField] Animator ProfileCreationPanelAnimator;
+    [SerializeField] Button BackToPlayPanelProfileCreation;
+    [SerializeField] TMP_InputField PlayerName;
+    [SerializeField] Button CreateProfileButton;
+
     [Header("OnlinePlayPanel")]
     [SerializeField] Animator OnlinePlayPanelAnimator;
     [SerializeField] Button HostOnlineGameButton;
     [SerializeField] Button JoinLobbyButton;
-    [SerializeField] GameObject JoinLobbySection;
-    [SerializeField] Button ConfirmJoiningLobbyButton;
     [SerializeField] Button BackToPlayPanelButtonOnline;
 
-    [Header("OnlineLobbyPanel")]
-    [SerializeField] Animator OnlineLobbyPanelAnimator;
-    [SerializeField] TextMeshProUGUI HostName;
-    [SerializeField] TextMeshProUGUI ClientName;
-    [SerializeField] Button LeaveLobbyButton;
+    [Header("JoinLobbyPanel")]
+    [SerializeField] Animator JoinLobbyPanelAnimator;
+    [SerializeField] TMP_InputField LobbyCodeInput;
+    [SerializeField] Button ConfirmCodeButton;
+    [SerializeField] Button BackToOnlinePanelJoin;
 
-    [Header("LobbyHostElements")]
-    [SerializeField] TextMeshProUGUI LobbyCode;
-    [SerializeField] Button KickClientButton;
+    [Header("LobbyPanel")]
+    [SerializeField] Animator LobbyPanelAnimator;
+    [SerializeField] GameObject PlayersInLobbyContainer;
+    [SerializeField] Button SwapTeamsButtton;
     [SerializeField] Button StartGameButton;
+    [SerializeField] Button BackToOnlinePanelLobby;
 
     private ChessColor playerColor;
     private int gameDifficulty;
@@ -52,30 +59,38 @@ public class MainMenuController : MonoBehaviour
 
 
         //Play Panel
-        OnlinePlayButton.onClick.AddListener(() => GameEvents.RequestHidePanel(PlayPanelAnimator, OnlinePlayPanelAnimator));
+        OnlinePlayButton.onClick.AddListener(GoOnlinePlay);
         OfflinePlayButton.onClick.AddListener(() => GameEvents.RequestHidePanel(PlayPanelAnimator, OfflinePlayPanelAnimator));
         BackToMenuButton.onClick.AddListener(() => GameEvents.RequestHidePanel(PlayPanelAnimator, MainPanelAnimator));
+
+        //Profile Creation Panel
+        CreateProfileButton.onClick.AddListener(() => CreateProfile(PlayerName.text));
+        BackToPlayPanelProfileCreation.onClick.AddListener(() => GameEvents.RequestHidePanel(ProfileCreationPanelAnimator, PlayPanelAnimator));
 
         //Offline Panel
         StartGameOfflineButton.onClick.AddListener(() => GameEvents.RequestStartGameOffline(playerColor, gameDifficulty));
         BackToPlayPanelButtonOffline.onClick.AddListener(() => GameEvents.RequestHidePanel(OfflinePlayPanelAnimator, PlayPanelAnimator));
 
-        //OnlinePanel
-        HostOnlineGameButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, OnlineLobbyPanelAnimator));
-        JoinLobbyButton.onClick.AddListener(() => ShowJoinSection());
-        //ConfirmJoiningLobbyButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlineLobbyPanelAnimator, OnlineLobbyPanelAnimator));
+        //Online Panel
+        HostOnlineGameButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, LobbyPanelAnimator));
+        JoinLobbyButton.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, JoinLobbyPanelAnimator));
         BackToPlayPanelButtonOnline.onClick.AddListener(() => GameEvents.RequestHidePanel(OnlinePlayPanelAnimator, PlayPanelAnimator));
-        
+
+        //JoinLobby
+        ConfirmCodeButton.onClick.AddListener(() => JoinLobbyByCode(LobbyCodeInput.text));
+        BackToOnlinePanelJoin.onClick.AddListener(() => GameEvents.RequestHidePanel(JoinLobbyPanelAnimator, OnlinePlayPanelAnimator));
+
         //LobbyPanel
-        LeaveLobbyButton.onClick?.AddListener(() => GameEvents.RequestHidePanel(OnlineLobbyPanelAnimator,PlayPanelAnimator));
+        BackToOnlinePanelLobby.onClick.AddListener(LeaveLobby);
         //kick
         //startgame
 
         PlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
+        ProfileCreationPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
         OfflinePlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
         OnlinePlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
-        OnlineLobbyPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
-        JoinLobbySection.SetActive(false);
+        JoinLobbyPanelAnimator.gameObject.GetComponent <PanelActivator>().DisactivePanel();
+        LobbyPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
     }
     private void OnEnable()
     {
@@ -104,8 +119,27 @@ public class MainMenuController : MonoBehaviour
     {
         gameDifficulty = difficulty;
     }
-    private void ShowJoinSection()
+    private void GoOnlinePlay()
     {
-        JoinLobbySection.SetActive(true);
+        if (PlayerPrefs.HasKey("PlayerName"))
+            GameEvents.RequestHidePanel(PlayPanelAnimator, OnlinePlayPanelAnimator);
+        else
+            GameEvents.RequestHidePanel(PlayPanelAnimator, ProfileCreationPanelAnimator);
+    }
+    private void CreateProfile(string playerName)
+    {
+        if(playerName.Length >=7 && playerName != null && !int.TryParse(playerName, out int id))
+        {
+            PlayerPrefs.SetString("PlayerName", playerName);
+            GameEvents.RequestHidePanel(ProfileCreationPanelAnimator, OnlinePlayPanelAnimator);
+        }
+    }
+    private void JoinLobbyByCode(string code)
+    {
+        Debug.Log(code);
+    }
+    private void LeaveLobby()
+    {
+        Debug.Log("LobbyExit");
     }
 }
