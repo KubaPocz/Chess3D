@@ -19,7 +19,22 @@ public static class GameEvents
     public static event Action OnExitGameRequested;
     public static event Action<GameResult,GameResultReason> OnGameEnds;
     //public static event Action<ChessColor,float> OnStartGameOfflineRequested;
-    
+
+    public static event Action CreateLobbyRequested;
+    public static event Action<string> JoinLobbyByCodeRequested;
+    public static event Action LeaveOrDeleteLobbyRequested;
+
+    // Powiadomienia do UI:
+    public static event Action<string, string> LobbyCreated;
+    public static event Action<string, string> LobbyJoined;
+    public static event Action LobbyLeftOrDeleted;
+    public static event Action<string> LobbyError;
+    public static event Action<string, string> LobbyPlayersUpdated;
+    public static event Action<List<string>> OnPlayersListUpdated;
+    public static event Action LobbyClosedByHost;
+    public static event Action OnSwapTeamsRequested;
+
+
     public static void RequestHighlights(List<BoardTile> tiles, ChessPiece piece)
     {
         OnHighlightRequested?.Invoke(tiles, piece);
@@ -73,4 +88,18 @@ public static class GameEvents
     {
         OnGameEnds?.Invoke(gameResult,gameResultReason);
     }
+    public static void RequestCreateLobby() => CreateLobbyRequested?.Invoke();
+    public static void RequestJoinByCode(string code) => JoinLobbyByCodeRequested?.Invoke(code);
+    public static void RequestLeaveOrDelete() => LeaveOrDeleteLobbyRequested?.Invoke();
+
+    public static void NotifyCreated(string id, string code) => LobbyCreated?.Invoke(id, code);
+    public static void NotifyJoined(string id, string code) => LobbyJoined?.Invoke(id, code);
+    public static void NotifyLeftOrDeleted() => LobbyLeftOrDeleted?.Invoke();
+    public static void NotifyError(string msg) => LobbyError?.Invoke(msg);
+    public static void NotifyPlayersUpdated(string hostName, string guestName)
+        => LobbyPlayersUpdated?.Invoke(hostName, guestName);
+    public static void NotifyPlayersListUpdated(List<string> players)
+    => OnPlayersListUpdated?.Invoke(players);
+    public static void NotifyLobbyClosedByHost() => LobbyClosedByHost?.Invoke();
+    public static void RequestSwapTeams() => OnSwapTeamsRequested?.Invoke();
 }
