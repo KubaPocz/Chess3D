@@ -18,7 +18,7 @@ public static class GameEvents
     public static event Action OnSurrenderGameRequested;
     public static event Action OnExitGameRequested;
     public static event Action<GameResult,GameResultReason> OnGameEnds;
-    //public static event Action<ChessColor,float> OnStartGameOfflineRequested;
+    public static event Action OnStartGameOnlineRequested;
 
     public static event Action CreateLobbyRequested;
     public static event Action<string> JoinLobbyByCodeRequested;
@@ -28,11 +28,24 @@ public static class GameEvents
     public static event Action<string, string> LobbyCreated;
     public static event Action<string, string> LobbyJoined;
     public static event Action LobbyLeftOrDeleted;
-    public static event Action<string> LobbyError;
+    public static event Action<string> OnNotifyError;
     public static event Action<string, string> LobbyPlayersUpdated;
     public static event Action<List<string>> OnPlayersListUpdated;
     public static event Action LobbyClosedByHost;
     public static event Action OnSwapTeamsRequested;
+    public static event System.Func<int, System.Threading.Tasks.Task<string>> HostAllocateRelayRequested;
+
+    // Klient prosi o JoinRelay + StartClient (scena zsynchronizuje siê po po³¹czeniu)
+    public static event System.Func<string, System.Threading.Tasks.Task> ClientJoinRelayRequested;
+
+    // Helpery do wywo³añ (opcjonalne, dla czytelnoœci)
+    public static System.Threading.Tasks.Task<string> RequestHostAllocateRelayAsync(int expectedClients)
+        => HostAllocateRelayRequested != null ? HostAllocateRelayRequested.Invoke(expectedClients)
+                                              : System.Threading.Tasks.Task.FromResult<string>(null);
+
+    public static System.Threading.Tasks.Task RequestClientJoinRelayAsync(string joinCode)
+        => ClientJoinRelayRequested != null ? ClientJoinRelayRequested.Invoke(joinCode)
+                                            : System.Threading.Tasks.Task.CompletedTask;
 
 
     public static void RequestHighlights(List<BoardTile> tiles, ChessPiece piece)
@@ -54,6 +67,10 @@ public static class GameEvents
         //OnStartGameOfflineRequested?.Invoke(playerColor, difficulty);
         SceneLoader.SceneToLoad = "GameBoard";
         SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
+    }
+    public static void RequestStartGameOnline()
+    {
+        OnStartGameOnlineRequested?.Invoke();
     }
     public static void RequestChangeGameDifficulty(int difficulty)
     {
@@ -95,7 +112,7 @@ public static class GameEvents
     public static void NotifyCreated(string id, string code) => LobbyCreated?.Invoke(id, code);
     public static void NotifyJoined(string id, string code) => LobbyJoined?.Invoke(id, code);
     public static void NotifyLeftOrDeleted() => LobbyLeftOrDeleted?.Invoke();
-    public static void NotifyError(string msg) => LobbyError?.Invoke(msg);
+    public static void NotifyError(string msg) => OnNotifyError?.Invoke(msg);
     public static void NotifyPlayersUpdated(string hostName, string guestName)
         => LobbyPlayersUpdated?.Invoke(hostName, guestName);
     public static void NotifyPlayersListUpdated(List<string> players)

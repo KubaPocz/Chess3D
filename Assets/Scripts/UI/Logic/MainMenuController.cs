@@ -44,7 +44,7 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] Animator LobbyPanelAnimator;
     [SerializeField] GameObject PlayersInLobbyContainer;
     [SerializeField] Button SwapTeamsButtton;
-    [SerializeField] Button StartGameButton;
+    [SerializeField] Button StartGameOnlineButton;
     [SerializeField] Button BackToOnlinePanelLobby;
     [SerializeField] TextMeshProUGUI codeLabel;
     [SerializeField] GameObject PlayerInLobby_PREFAB;
@@ -85,7 +85,7 @@ public class MainMenuController : MonoBehaviour
         //LobbyPanel
         BackToOnlinePanelLobby.onClick.AddListener(() => { GameEvents.RequestHidePanel(LobbyPanelAnimator, OnlinePlayPanelAnimator); LeaveLobby(); });
         SwapTeamsButtton.onClick.AddListener(() => GameEvents.RequestSwapTeams());
-        //startgame
+        StartGameOnlineButton.onClick.AddListener(() => GameEvents.RequestStartGameOnline());
 
         PlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
         ProfileCreationPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
@@ -170,6 +170,7 @@ public class MainMenuController : MonoBehaviour
     void SetSwapTeamsVisibility(bool isHost)
     {
         SwapTeamsButtton.gameObject.SetActive(isHost);
+        StartGameOnlineButton.gameObject.SetActive(isHost);
     }
     void UpdatePlayersInLobbyUI(List<string> players)
     {

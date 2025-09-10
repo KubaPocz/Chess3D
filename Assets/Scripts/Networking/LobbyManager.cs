@@ -16,7 +16,8 @@ public class LobbyManager : MonoBehaviour
 
     private ILobbyEvents lobbyEvents;
     private Lobby currentLobby;
-
+    const string KEY_STARTED = "started";
+    const string KEY_JOINCODE = "joinCode";
     void Awake() => DontDestroyOnLoad(gameObject);
 
     async void Start()
@@ -32,6 +33,7 @@ public class LobbyManager : MonoBehaviour
         GameEvents.JoinLobbyByCodeRequested += OnJoinByCodeRequested;
         GameEvents.LeaveOrDeleteLobbyRequested += OnLeaveOrDeleteRequested;
         GameEvents.OnSwapTeamsRequested += SwapTeams;
+        GameEvents.OnStartGameOnlineRequested += StartGameOnline;
     }
 
     void OnDisable()
@@ -40,6 +42,8 @@ public class LobbyManager : MonoBehaviour
         GameEvents.JoinLobbyByCodeRequested -= OnJoinByCodeRequested;
         GameEvents.LeaveOrDeleteLobbyRequested -= OnLeaveOrDeleteRequested;
         GameEvents.OnSwapTeamsRequested -= SwapTeams;
+        GameEvents.OnStartGameOnlineRequested -= StartGameOnline;
+
     }
 
     async void OnCreateLobbyRequested()
@@ -151,6 +155,45 @@ public class LobbyManager : MonoBehaviour
 
         }
     }
+    public async void StartGameOnline()
+    {
+        if(!isHost || currentLobby == null)
+        {
+            GameEvents.NotifyError("Tylko host mo¿e rozpocz¹æ grê.");
+            return;
+        }
+        if (currentLobby.Players == null || currentLobby.Players.Count != 2)
+        {
+            GameEvents.NotifyError("Ta gra wymaga dok³adnie 2 graczy.");
+            return;
+        }
+        try
+        {
+            string joinCode = await GameEvents.RequestHostAllocateRelayAsync(1);
+            if (string.IsNullOrEmpty(joinCode))
+            {
+                GameEvents.NotifyError("Nie uda³o siê przygotowaæ sesji sieciowej (Relay).");
+                return;
+            }
+            await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, new UpdateLobbyOptions
+            {
+                Data = new Dictionary<string, DataObject>
+            {
+                { KEY_STARTED,  new DataObject(DataObject.VisibilityOptions.Member, "true") },
+                { KEY_JOINCODE, new DataObject(DataObject.VisibilityOptions.Member, joinCode) }
+            }
+            });
+        }
+        catch (LobbyServiceException e)
+        {
+            GameEvents.NotifyError($"StartGameOnline failed (Lobby): {e.Reason}");
+        }
+        catch (System.Exception ex)
+        {
+            GameEvents.NotifyError($"StartGameOnline failed: {ex.Message}");
+        }
+    }
+
 
     async void OnLeaveOrDeleteRequested()
     {
@@ -221,6 +264,17 @@ public class LobbyManager : MonoBehaviour
         if (currentLobby == null) return;
         changes.ApplyToLobby(currentLobby);
         RefreshPlayersUI();
+
+        if (!isHost &&
+        currentLobby.Data != null &&
+        currentLobby.Data.TryGetValue(KEY_STARTED, out var startedObj) &&
+        startedObj.Value == "true" &&
+        currentLobby.Data.TryGetValue(KEY_JOINCODE, out var jcObj) &&
+        !string.IsNullOrEmpty(jcObj.Value))
+        {
+            // Poproœ koordynatora sieci o JoinRelay + StartClient
+            _ = GameEvents.RequestClientJoinRelayAsync(jcObj.Value);
+        }
     }
 
     void OnLobbyDeleted()

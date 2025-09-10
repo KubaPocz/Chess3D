@@ -7,6 +7,8 @@ public class GameSetupManager : MonoBehaviour
 
     [SerializeField] public GameObject humanPrefab;
     [SerializeField] public GameObject botPrefab;
+    [SerializeField] public Camera whiteCamera;
+    [SerializeField] public Camera blackCamera;
 
     public IPlayerController player1 { get; private set; }
     public IPlayerController player2 { get; private set; }
@@ -30,10 +32,12 @@ public class GameSetupManager : MonoBehaviour
                 break;
             case (GameMode.HumanVsBot):
                 player1 = Instantiate(humanPrefab).GetComponent<IPlayerController>();
-                Debug.Log($"[Setup] player1 = {player1}");
                 player2 = Instantiate(botPrefab).GetComponent<IPlayerController>();
-                Debug.Log($"[Setup] player2 = {player2}");
                 SceneManager.LoadScene("UI_Offline", LoadSceneMode.Additive);
+                //setting cameras
+                whiteCamera.gameObject.SetActive(GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White);
+                blackCamera.gameObject.SetActive(GameConfigStore.CurrentConfig.PlayerColor == ChessColor.Black);
+
                 break;
             default:
                 throw new System.Exception("Unsupported game mode.");
