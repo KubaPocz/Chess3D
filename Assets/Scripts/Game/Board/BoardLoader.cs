@@ -28,12 +28,7 @@ public class BoardLoader : MonoBehaviour
         tileBlack = BoardManager.Instance.tileBlack;
         GenerateBoard();
         SpawnAllPieces();
-        SpawnFrame();
         BoardManager.Instance.SetGameBoard(tiles);
-    }
-    void SpawnFrame()
-    {
-        Instantiate(boardFrame,new Vector3(0,0,0), Quaternion.identity,tilesParent.transform);
     }
     void GenerateBoard()
     {

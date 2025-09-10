@@ -15,7 +15,7 @@ public class Pawn : ChessPiece
         if(IsEmpty(position.x, nextRow) && !includeIllegal)
             moves.Add(Board[position.x, nextRow]);
 
-        if (position.y == startRow && IsEmpty(position.x, nextRow) && IsEmpty(position.y, position.y + 2 * direction) && !includeIllegal)
+        if (position.y == startRow && IsEmpty(position.x, nextRow) && IsEmpty(position.y, position.y + 2 * direction))
             moves.Add(Board[position.x, position.y + 2 * direction]);
 
         for(int dx = -1; dx <= 1; dx += 2)
