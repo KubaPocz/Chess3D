@@ -74,7 +74,6 @@ public class GameManager : MonoBehaviour
         SwitchTurn();
 
         CurrentPlayer.StartTurn();
-        Debug.Log("onmovecompleted");
     }
 
     private void SwitchTurn()
@@ -117,5 +116,42 @@ public class GameManager : MonoBehaviour
         SceneLoader.SceneToLoad = "MainMenu";
         SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
     }
+    public void MovePiece(string uci)
+    {
+        var(from,to) = UCIHelper.ToBoardTile(uci);
+        if (from.CurrentPiece == null) return;
+        ChessPiece movingPiece = from.CurrentPiece;
+        if(to.CurrentPiece != null)
+        {
+            BoardManager.Instance.allPieces.Remove(to.CurrentPiece);
+            Destroy(to.CurrentPiece.gameObject);
+        }
+        from.SetPiece(null);
+        to.SetPiece(movingPiece);
 
+        movingPiece.CurrentTile = to;
+        movingPiece.transform.position = to.transform.position;
+        movingPiece.HasMoved = true;
+
+        OnMoveCompleted();
+    }
+    public void MovePiece(BoardTile from, BoardTile to)
+    {
+        ChessPiece movingPiece = from.CurrentPiece;
+        if (to.CurrentPiece != null)
+        {
+            BoardManager.Instance.allPieces.Remove(to.CurrentPiece);
+            Destroy(to.CurrentPiece.gameObject);
+        }
+        from.SetPiece(null);
+        to.SetPiece(movingPiece);
+
+        movingPiece.CurrentTile = to;
+        movingPiece.transform.position = to.transform.position;
+        movingPiece.HasMoved = true;
+
+        GameEvents.RequestClearHighlights();
+
+        OnMoveCompleted();
+    }
 }

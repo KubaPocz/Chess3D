@@ -21,10 +21,12 @@ public class MoveHighlighter : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.OnHighlightRequested += HighlightTiles;
+        GameEvents.OnClearHighlightsRequested += ClearHighlights;
     }
     private void OnDisable()
     {
         GameEvents.OnHighlightRequested -= HighlightTiles;
+        GameEvents.OnClearHighlightsRequested -= ClearHighlights;
     }
     private void HighlightTiles(List<BoardTile> tiles,ChessPiece piece)
     {

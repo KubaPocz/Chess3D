@@ -29,10 +29,6 @@ public class BotPlayerController : MonoBehaviour, IPlayerController
     private IEnumerator ApplyMove(string uci)
     {
         yield return new WaitForSecondsRealtime(Random.Range(1f, 4f));
-        var from = UCIHelper.ToBoardTile(uci.Substring(0, 2));
-        var to = UCIHelper.ToBoardTile(uci.Substring(2, 2));
-
-        var piece = from.CurrentPiece;
-        piece?.MovePiece(to);
+        GameManager.Instance.MovePiece(uci);
     }
 }

@@ -2,11 +2,21 @@ using UnityEngine;
 
 public static class UCIHelper
 {
-    public static BoardTile ToBoardTile(string uci)
+    public static (BoardTile from, BoardTile to) ToBoardTile(string uci)
     {
-        int file = uci[0] - 'a';
-        int rank = int.Parse(uci[1].ToString()) - 1;
+        int fromFile = uci[0] - 'a';
+        int fromRank = int.Parse(uci[1].ToString()) - 1;
+        BoardTile fromTile = BoardManager.Instance.GameBoard[fromFile, fromRank];
 
-        return BoardManager.Instance.GameBoard[file, rank];
+        int toFile = uci[2] - 'a';
+        int toRank = int.Parse(uci[3].ToString()) - 1;
+        BoardTile toTile = BoardManager.Instance.GameBoard[toFile, toRank];
+
+        return (fromTile, toTile);
     }
+    public static string ToUCI(BoardTile from, BoardTile to)
+    {
+        return (from.TileName + to.TileName).ToLower();
+    }
+
 }

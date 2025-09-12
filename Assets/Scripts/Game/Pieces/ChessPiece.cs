@@ -5,7 +5,7 @@ abstract public class ChessPiece : MonoBehaviour
 {
     public bool HasMoved = false;
     public ChessColor Color { get; private set; }
-    public BoardTile CurrentTile { get; private set; }
+    public BoardTile CurrentTile { get; set; }
     protected BoardTile[,] Board;
     public PieceType PieceType { get; protected set; }
     public static event System.Action<List<BoardTile>,ChessPiece> OnAnyPieceClicked;
@@ -58,28 +58,5 @@ abstract public class ChessPiece : MonoBehaviour
         if (!GameManager.Instance.IsCurrentTurn(Color))
             return;
         OnAnyPieceClicked?.Invoke(GetAvailableMoves(), this);
-    }
-    public void MovePiece(BoardTile targetTile)
-    {
-        if (CurrentTile != null)
-        {
-            CurrentTile.SetPiece(null);
-        }
-
-        if(targetTile.CurrentPiece != null)
-        {
-            ChessPiece target = targetTile.CurrentPiece;
-            BoardManager.Instance.allPieces.Remove(target);
-            Destroy(target.gameObject);
-        }
-
-        targetTile.SetPiece(this);
-        CurrentTile = targetTile;
-
-        transform.position = targetTile.transform.position;
-
-        HasMoved = true;
-
-        GameManager.Instance.OnMoveCompleted();
     }
 }
