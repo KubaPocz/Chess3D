@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour
         GameEvents.OnPauseGameRequested += PasueGame;
         GameEvents.OnExitGameRequested += ExitGame;
 
+        GameEvents.OnMovePieceOfflineRequested += MovePiece;
+
         var setup = GameSetupManager.Instance;
 
         ChessColor player1Color = GameConfigStore.CurrentConfig.PlayerColor;
@@ -128,10 +130,12 @@ public class GameManager : MonoBehaviour
         }
         from.SetPiece(null);
         to.SetPiece(movingPiece);
-
         movingPiece.CurrentTile = to;
-        movingPiece.transform.position = to.transform.position;
         movingPiece.HasMoved = true;
+
+        GameEvents.RequestClearHighlights();
+
+        BoardManager.Instance.RefreshBoardVisuals();
 
         OnMoveCompleted();
     }
@@ -145,13 +149,14 @@ public class GameManager : MonoBehaviour
         }
         from.SetPiece(null);
         to.SetPiece(movingPiece);
-
         movingPiece.CurrentTile = to;
-        movingPiece.transform.position = to.transform.position;
         movingPiece.HasMoved = true;
 
         GameEvents.RequestClearHighlights();
 
+        BoardManager.Instance.RefreshBoardVisuals();
+
         OnMoveCompleted();
     }
+
 }

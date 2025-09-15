@@ -38,4 +38,20 @@ public class BoardManager : MonoBehaviour
     {
         GameBoard = board;
     }
+    public void RefreshBoardVisuals()
+    {
+        for (int x = 0; x < 8; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                BoardTile tile = GameBoard[x, y];
+                ChessPiece piece = tile.CurrentPiece;
+
+                if (piece != null)
+                {
+                    piece.transform.position = tile.transform.position;
+                }
+            }
+        }
+    }
 }

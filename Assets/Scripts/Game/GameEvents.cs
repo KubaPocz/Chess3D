@@ -24,7 +24,8 @@ public static class GameEvents
     public static event Action CreateLobbyRequested;
     public static event Action<string> JoinLobbyByCodeRequested;
     public static event Action LeaveOrDeleteLobbyRequested;
-
+    public static event Action<BoardTile, BoardTile> OnMovePieceOfflineRequested;
+    public static event Action<BoardTile, BoardTile> OnMovePieceOnlineRequested;
     // Powiadomienia do UI:
     public static event Action<string, string> LobbyCreated;
     public static event Action<string, string> LobbyJoined;
@@ -115,4 +116,11 @@ public static class GameEvents
     => OnPlayersListUpdated?.Invoke(players);
     public static void NotifyLobbyClosedByHost() => LobbyClosedByHost?.Invoke();
     public static void RequestSwapTeams() => OnSwapTeamsRequested?.Invoke();
+    public static void RequestMovePiece(BoardTile from, BoardTile to)
+    {
+        if (GameConfigStore.CurrentConfig.GameMode == GameMode.HumanVsHuman)
+            OnMovePieceOnlineRequested?.Invoke(from, to);
+        else
+            OnMovePieceOfflineRequested?.Invoke(from, to);
+    }
 }
