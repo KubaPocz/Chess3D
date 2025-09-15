@@ -85,7 +85,7 @@ public class MainMenuController : MonoBehaviour
         //LobbyPanel
         BackToOnlinePanelLobby.onClick.AddListener(() => { GameEvents.RequestHidePanel(LobbyPanelAnimator, OnlinePlayPanelAnimator); LeaveLobby(); });
         SwapTeamsButtton.onClick.AddListener(() => GameEvents.RequestSwapTeams());
-        StartGameOnlineButton.onClick.AddListener(() => GameEvents.RequestStartGameOnline());
+        StartGameOnlineButton.onClick.AddListener(() => GameEvents.RequestStartGameOnline(GameConfigStore.CurrentConfig.PlayerColor));
 
         PlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
         ProfileCreationPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();

@@ -69,8 +69,11 @@ public static class GameEvents
         SceneLoader.SceneToLoad = "GameBoard";
         SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
     }
-    public static void RequestStartGameOnline()
+    public static void RequestStartGameOnline(ChessColor hostColor)
     {
+        GameConfigStore.CurrentConfig = new GameConfig(GameMode.HumanVsHuman, hostColor);
+        SceneLoader.SceneToLoad = "GameBoard";
+        SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
         OnStartGameOnlineRequested?.Invoke();
     }
     public static void RequestChangeGameDifficulty(int difficulty)

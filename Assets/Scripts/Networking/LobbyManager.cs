@@ -140,7 +140,7 @@ public class LobbyManager : MonoBehaviour
 
             string hostColor = currentLobby.Data.TryGetValue("hostColor", out var hc) ? hc.Value : "White";
             string clientColor = currentLobby.Data.TryGetValue("clientColor", out var cc) ? cc.Value : "Black";
-
+            GameConfigStore.CurrentConfig.PlayerColor = hostColor == "White" ? ChessColor.White : ChessColor.Black;
             await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>

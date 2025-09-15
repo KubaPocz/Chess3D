@@ -12,6 +12,7 @@ public class OnlineSessionCoordinator : NetworkBehaviour
     public static OnlineSessionCoordinator Instance { get; private set; }
     [SerializeField] UnityTransport transport;
     [SerializeField] string gameSceneName = "Game";
+    public ChessColor hostColor;
     private void Awake()
     {
         DontDestroyOnLoad(this);
