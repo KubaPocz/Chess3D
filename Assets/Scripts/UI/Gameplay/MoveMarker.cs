@@ -11,10 +11,10 @@ public class MoveMarker : MonoBehaviour
     }
     private void OnMouseDown()
     {
+        Debug.Log(selectedPiece);
         if (selectedPiece != null)
         {
-            selectedPiece.MovePiece(currentTile);
-            MoveHighlighter.Instance.ClearHighlights();
+            GameEvents.RequestMovePiece(selectedPiece.CurrentTile, currentTile);   
         }
     }
 }
