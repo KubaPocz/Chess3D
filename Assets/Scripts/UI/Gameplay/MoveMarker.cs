@@ -14,7 +14,7 @@ public class MoveMarker : MonoBehaviour
         Debug.Log(selectedPiece);
         if (selectedPiece != null)
         {
-            GameEvents.RequestMovePiece(selectedPiece.CurrentTile, currentTile);   
+            GameEvents.RequestMovePiece(UCIHelper.ToUCI(selectedPiece.CurrentTile, currentTile));   
         }
     }
 }

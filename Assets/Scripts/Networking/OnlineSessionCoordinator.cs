@@ -7,20 +7,36 @@ using Unity.Networking.Transport.Relay;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
 
-public class OnlineSessionCoordinator : MonoBehaviour
+public class OnlineSessionCoordinator : NetworkBehaviour
 {
+    public static OnlineSessionCoordinator Instance { get; private set; }
     [SerializeField] UnityTransport transport;
     [SerializeField] string gameSceneName = "Game";
+    private void Awake()
+    {
+        if(Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     void OnEnable()
     {
         GameEvents.HostAllocateRelayRequested += OnHostAllocateRelayRequested;
         GameEvents.ClientJoinRelayRequested += OnClientJoinRelayRequested;
+
+        GameEvents.OnMovePieceOnlineRequested += MovePieceServerRpc;
+        GameEvents.OnRefreshBoardVisualsOnline += RefreshBoardVisualsClientRpc;
     }
     void OnDisable()
     {
         GameEvents.HostAllocateRelayRequested -= OnHostAllocateRelayRequested;
         GameEvents.ClientJoinRelayRequested -= OnClientJoinRelayRequested;
+
+        GameEvents.OnMovePieceOnlineRequested -= MovePieceServerRpc;
+        GameEvents.OnRefreshBoardVisualsOnline -= RefreshBoardVisualsClientRpc;
     }
 
     async Task<string> OnHostAllocateRelayRequested(int expectedClients)
@@ -63,5 +79,16 @@ public class OnlineSessionCoordinator : MonoBehaviour
         {
             Debug.LogError("Client join failed: " + ex.Message);
         }
+    }
+    [ServerRpc]
+    public void MovePieceServerRpc(string uci)
+    {
+        GameManager.Instance.MovePiece(uci);
+    }
+
+    [ClientRpc]
+    public void RefreshBoardVisualsClientRpc()
+    {
+        BoardManager.Instance.RefreshBoardVisuals();
     }
 }

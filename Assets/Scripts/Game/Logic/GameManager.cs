@@ -135,28 +135,8 @@ public class GameManager : MonoBehaviour
 
         GameEvents.RequestClearHighlights();
 
-        BoardManager.Instance.RefreshBoardVisuals();
+        GameEvents.RequestRefreshBoardVisuals();
 
         OnMoveCompleted();
     }
-    public void MovePiece(BoardTile from, BoardTile to)
-    {
-        ChessPiece movingPiece = from.CurrentPiece;
-        if (to.CurrentPiece != null)
-        {
-            BoardManager.Instance.allPieces.Remove(to.CurrentPiece);
-            Destroy(to.CurrentPiece.gameObject);
-        }
-        from.SetPiece(null);
-        to.SetPiece(movingPiece);
-        movingPiece.CurrentTile = to;
-        movingPiece.HasMoved = true;
-
-        GameEvents.RequestClearHighlights();
-
-        BoardManager.Instance.RefreshBoardVisuals();
-
-        OnMoveCompleted();
-    }
-
 }

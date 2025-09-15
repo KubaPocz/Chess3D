@@ -23,6 +23,15 @@ public class BoardManager : MonoBehaviour
 
         Instance = this;
     }
+    private void OnEnable()
+    {
+        GameEvents.OnRefreshBoardVisualsOffline += RefreshBoardVisuals;
+    }
+    private void OnDisable()
+    {
+        GameEvents.OnRefreshBoardVisualsOffline -= RefreshBoardVisuals;
+
+    }
     public List<BoardTile> GetAllAttackedTiles(ChessColor byColor)
     {
         List<BoardTile> attackedTiles = new();
