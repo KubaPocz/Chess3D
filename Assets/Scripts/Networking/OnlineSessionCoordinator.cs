@@ -14,6 +14,7 @@ public class OnlineSessionCoordinator : NetworkBehaviour
     [SerializeField] string gameSceneName = "Game";
     private void Awake()
     {
+        DontDestroyOnLoad(this);
         if(Instance != null && Instance != this)
         {
             Destroy(gameObject);
