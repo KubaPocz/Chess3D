@@ -1,55 +1,59 @@
+using Core.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Toggle))]
-public class ToggleController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+namespace UI.Components
 {
-    public ChessColor color;
-    public Image targetGraphic;
-    public Color onColor = Color.white;
-    public Color offColor = new Color(1, 1, 1, 0.1f);
-    public Color hoverColor = new Color(1, 1, 1, 0.3f);
-
-    private Toggle toggle;
-    private bool isHovered = false;
-
-    void Awake()
+    [RequireComponent(typeof(Toggle))]
+    public class ToggleController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        toggle = GetComponent<Toggle>();
-        toggle.onValueChanged.AddListener(OnToggleValueChanged);
+        public ChessColor color;
+        public Image targetGraphic;
+        public Color onColor = Color.white;
+        public Color offColor = new(1, 1, 1, 0.1f);
+        public Color hoverColor = new(1, 1, 1, 0.3f);
 
-        UpdateVisual();
-    }
-    private void OnToggleValueChanged(bool isOn)
-    {
-        UpdateVisual();
-        if (isOn)
+        Toggle _toggle;
+        bool _isHovered = false;
+
+        void Awake()
         {
-            GameEvents.RequestColorChange(color);
+            _toggle = GetComponent<Toggle>();
+            _toggle.onValueChanged.AddListener(OnToggleValueChanged);
+
+            UpdateVisual();
         }
-        Debug.Log($"{color} toggle changed: isOn = {isOn}");
-    }
+        void OnToggleValueChanged(bool isOn)
+        {
+            UpdateVisual();
+            if (isOn)
+            {
+                GameEvents.RequestColorChange(color);
+            }
+            Debug.Log($"{color} toggle changed: isOn = {isOn}");
+        }
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        isHovered = true;
-        UpdateVisual();
-    }
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            _isHovered = true;
+            UpdateVisual();
+        }
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        isHovered = false;
-        UpdateVisual();
-    }
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            _isHovered = false;
+            UpdateVisual();
+        }
 
-    void UpdateVisual()
-    {
-        if (toggle.isOn)
-            targetGraphic.color = onColor;
-        else if (isHovered)
-            targetGraphic.color = hoverColor;
-        else
-            targetGraphic.color = offColor;
+        void UpdateVisual()
+        {
+            if (_toggle.isOn)
+                targetGraphic.color = onColor;
+            else if (_isHovered)
+                targetGraphic.color = hoverColor;
+            else
+                targetGraphic.color = offColor;
+        }
     }
 }

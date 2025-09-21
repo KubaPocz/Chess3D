@@ -1,6 +1,11 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Core.Boot;
+using Core.Config;
+using Core.Utilities;
+using Game.Board;
+using Game.Pieces;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -41,10 +46,10 @@ public static class GameEvents
     public static event Action OnSwapTeamsRequested;
     public static event System.Func<int, System.Threading.Tasks.Task<string>> HostAllocateRelayRequested;
 
-    // Klient prosi o JoinRelay + StartClient (scena zsynchronizuje siê po po³¹czeniu)
+    // Klient prosi o JoinRelay + StartClient (scena zsynchronizuje siï¿½ po poï¿½ï¿½czeniu)
     public static event System.Func<string, System.Threading.Tasks.Task> ClientJoinRelayRequested;
 
-    // Helpery do wywo³añ (opcjonalne, dla czytelnoœci)
+    // Helpery do wywoï¿½aï¿½ (opcjonalne, dla czytelnoï¿½ci)
     public static System.Threading.Tasks.Task<string> RequestHostAllocateRelayAsync(int expectedClients)
         => HostAllocateRelayRequested != null ? HostAllocateRelayRequested.Invoke(expectedClients)
                                               : System.Threading.Tasks.Task.FromResult<string>(null);
@@ -69,9 +74,8 @@ public static class GameEvents
         SceneLoader.SceneToLoad = "GameBoard";
         SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
     }
-    public static void RequestStartGameOnline(ChessColor hostColor)
+    public static void RequestStartGameOnline()
     {
-        GameConfigStore.CurrentConfig = new GameConfig(GameMode.HumanVsHuman, hostColor);
         SceneLoader.SceneToLoad = "GameBoard";
         SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
         OnStartGameOnlineRequested?.Invoke();

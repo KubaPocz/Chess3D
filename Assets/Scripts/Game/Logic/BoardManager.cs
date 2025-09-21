@@ -1,64 +1,70 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Utilities;
+using Game.Board;
+using Game.Pieces;
 using UnityEngine;
 
-public class BoardManager : MonoBehaviour
+namespace Game.Logic
 {
-    public static BoardManager Instance;
-    [SerializeField] public Material tileWhite;
-    [SerializeField] public Material tileBlack;
+    public class BoardManager : MonoBehaviour
+    {
+        public static BoardManager Instance;
+        [SerializeField] public Material tileWhite;
+        [SerializeField] public Material tileBlack;
 
-    [SerializeField] public Material pieceWhite;
-    [SerializeField] public Material pieceBlack;
-    public BoardTile[,] GameBoard { get; private set; }
-    [NonSerialized] public List<ChessPiece> allPieces = new();
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
+        [SerializeField] public Material pieceWhite;
+        [SerializeField] public Material pieceBlack;
+        public BoardTile[,] GameBoard { get; private set; }
+        [NonSerialized] public List<ChessPiece> allPieces = new();
+        void Awake()
         {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-    }
-    private void OnEnable()
-    {
-        GameEvents.OnRefreshBoardVisualsOffline += RefreshBoardVisuals;
-    }
-    private void OnDisable()
-    {
-        GameEvents.OnRefreshBoardVisualsOffline -= RefreshBoardVisuals;
-
-    }
-    public List<BoardTile> GetAllAttackedTiles(ChessColor byColor)
-    {
-        List<BoardTile> attackedTiles = new();
-        foreach (ChessPiece piece in allPieces)
-        {
-            if (piece.Color == byColor) continue;
-            attackedTiles.AddRange(piece.GetAvailableMoves(true));
-        }
-        return attackedTiles.Distinct().ToList();
-    }
-    public bool IsTileUnderAttack(BoardTile tile, ChessColor attackerColor) => GetAllAttackedTiles(attackerColor).Contains(tile);
-    public void SetGameBoard(BoardTile[,] board)
-    {
-        GameBoard = board;
-    }
-    public void RefreshBoardVisuals()
-    {
-        for (int x = 0; x < 8; x++)
-        {
-            for (int y = 0; y < 8; y++)
+            if (Instance != null && Instance != this)
             {
-                BoardTile tile = GameBoard[x, y];
-                ChessPiece piece = tile.CurrentPiece;
+                Destroy(gameObject);
+                return;
+            }
 
-                if (piece != null)
+            Instance = this;
+        }
+        void OnEnable()
+        {
+            GameEvents.OnRefreshBoardVisualsOffline += RefreshBoardVisuals;
+        }
+        void OnDisable()
+        {
+            GameEvents.OnRefreshBoardVisualsOffline -= RefreshBoardVisuals;
+
+        }
+        public List<BoardTile> GetAllAttackedTiles(ChessColor byColor)
+        {
+            List<BoardTile> attackedTiles = new();
+            foreach (ChessPiece piece in allPieces)
+            {
+                if (piece.Color == byColor) continue;
+                attackedTiles.AddRange(piece.GetAvailableMoves(true));
+            }
+            return attackedTiles.Distinct().ToList();
+        }
+        public bool IsTileUnderAttack(BoardTile tile, ChessColor attackerColor) => GetAllAttackedTiles(attackerColor).Contains(tile);
+        public void SetGameBoard(BoardTile[,] board)
+        {
+            GameBoard = board;
+        }
+        public void RefreshBoardVisuals()
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
                 {
-                    piece.transform.position = tile.transform.position;
+                    BoardTile tile = GameBoard[x, y];
+                    ChessPiece piece = tile.CurrentPiece;
+
+                    if (piece != null)
+                    {
+                        piece.transform.position = tile.transform.position;
+                    }
                 }
             }
         }

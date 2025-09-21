@@ -1,34 +1,60 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Core.Config;
+using Core.Interfaces;
+using Core.Utilities;
+using Game.Board;
+using Game.Boot;
+using Game.Pieces;
+using Unity.Netcode;
 
-public class NetworkPlayerController : MonoBehaviour, IPlayerController
+namespace Networking
 {
-    public static event Action<List<BoardTile>, ChessPiece> HighlightTiles;
-    public ChessColor PlayerColor;
-    public void Initialize(ChessColor playerColor)
+    public class NetworkPlayerController : NetworkBehaviour, IPlayerController
     {
-        PlayerColor = playerColor;
-    }
-    private void OnEnable()
-    {
-        ChessPiece.OnAnyPieceClicked += OnPieceSelected;
-    }
-    private void OnDisable()
-    {
-        ChessPiece.OnAnyPieceClicked -= OnPieceSelected;
-    }
-    public void StartTurn()
-    {
-        enabled = true;
-    }
-    public void EndTurn()
-    {
-        GameEvents.RequestAddPlayerMove();
-        enabled = false;
-    }
-    private void OnPieceSelected(List<BoardTile> tiles, ChessPiece piece)
-    {
-        GameEvents.RequestHighlights(tiles, piece);
+        public NetworkVariable<ChessColor> PlayerColor = new NetworkVariable<ChessColor>();
+        public override void OnNetworkSpawn()
+        {
+            if (IsServer)
+            {
+                if (OwnerClientId == NetworkManager.ServerClientId)
+                {
+                    PlayerColor.Value = GameConfigStore.CurrentConfig.PlayerColor;
+                }
+                else
+                {
+                    PlayerColor.Value = GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White
+                        ? ChessColor.Black
+                        : ChessColor.White;
+                }
+            }
+
+            GameSetupManager.Instance.RegisterPlayer(this);
+        }
+        public void Initialize(ChessColor playerColor)
+        {
+            PlayerColor.Value = playerColor;
+        }
+        void OnEnable()
+        {
+            ChessPiece.OnAnyPieceClicked += OnPieceSelected;
+        }
+        void OnDisable()
+        {
+            ChessPiece.OnAnyPieceClicked -= OnPieceSelected;
+        }
+        public void StartTurn()
+        {
+            enabled = true;
+        }
+        public void EndTurn()
+        {
+            GameEvents.RequestAddPlayerMove();
+            enabled = false;
+        }
+        void OnPieceSelected(List<BoardTile> tiles, ChessPiece piece)
+        {
+            GameEvents.RequestHighlights(tiles, piece);
+        }
     }
 }

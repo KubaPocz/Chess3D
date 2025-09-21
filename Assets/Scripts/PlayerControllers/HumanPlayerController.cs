@@ -1,36 +1,39 @@
-using NUnit.Framework;
 using System.Collections.Generic;
-using Unity.Plastic.Newtonsoft.Json.Serialization;
-using UnityEditor;
+using Core.Interfaces;
+using Core.Utilities;
+using Game.Board;
+using Game.Pieces;
 using UnityEngine;
 
-public class HumanPlayerController : MonoBehaviour, IPlayerController
+namespace PlayerControllers
 {
-    public static event Action<List<BoardTile>,ChessPiece> HighlightTiles;
-    public ChessColor PlayerColor { get; private set; }
-    public void StartTurn()
+    public class HumanPlayerController : MonoBehaviour, IPlayerController
     {
-        enabled = true;
-    }
-    public void EndTurn()
-    {
-        GameEvents.RequestAddPlayerMove();
-        enabled = false;
-    }
-    public void Initialize(ChessColor playerColor)
-    {
-        PlayerColor = playerColor;
-    }
-    private void OnEnable()
-    {
-        ChessPiece.OnAnyPieceClicked += OnPieceSelected;
-    }
-    private void OnDisable()
-    {
-        ChessPiece.OnAnyPieceClicked -= OnPieceSelected;
-    }
-    private void OnPieceSelected(List<BoardTile> tiles ,ChessPiece piece)
-    {
-        GameEvents.RequestHighlights(tiles, piece);
+        public ChessColor PlayerColor { get; private set; }
+        public void StartTurn()
+        {
+            enabled = true;
+        }
+        public void EndTurn()
+        {
+            GameEvents.RequestAddPlayerMove();
+            enabled = false;
+        }
+        public void Initialize(ChessColor playerColor)
+        {
+            PlayerColor = playerColor;
+        }
+        void OnEnable()
+        {
+            ChessPiece.OnAnyPieceClicked += OnPieceSelected;
+        }
+        void OnDisable()
+        {
+            ChessPiece.OnAnyPieceClicked -= OnPieceSelected;
+        }
+        void OnPieceSelected(List<BoardTile> tiles ,ChessPiece piece)
+        {
+            GameEvents.RequestHighlights(tiles, piece);
+        }
     }
 }

@@ -1,4 +1,7 @@
-public static class GameConfigStore
+namespace Core.Config
 {
-    public static GameConfig CurrentConfig { get; set; }
+    public static class GameConfigStore
+    {
+        public static GameConfig CurrentConfig { get; set; }
+    }
 }

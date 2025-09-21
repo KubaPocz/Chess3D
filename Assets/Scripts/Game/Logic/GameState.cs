@@ -1,11 +1,14 @@
-public enum GameState
+namespace Game.Logic
 {
-    WaitingForPlayers,
-    InProgress,
-    Check,
-    Checkmate,
-    Stalemate,
-    Draw,
-    Paused,
-    Ended
+    public enum GameState
+    {
+        WaitingForPlayers,
+        InProgress,
+        Check,
+        Checkmate,
+        Stalemate,
+        Draw,
+        Paused,
+        Ended
+    }
 }

@@ -1,34 +1,42 @@
 using System.Collections;
+using AI;
+using Core.Config;
+using Core.Interfaces;
+using Core.Utilities;
+using Game.Logic;
 using UnityEngine;
 
-public class BotPlayerController : MonoBehaviour, IPlayerController
+namespace PlayerControllers
 {
-    public ChessColor PlayerColor { get; private set; }
-    private StockfishEngine stockfish;
-    public void StartTurn()
+    public class BotPlayerController : MonoBehaviour, IPlayerController
     {
-        enabled = true;
-        string fen = FENGenerator.GenerateFromBoard();
-        string bestmove = stockfish.GetBestMove(fen);
+        public ChessColor PlayerColor { get; private set; }
+        StockfishEngine _stockfish;
+        public void StartTurn()
+        {
+            enabled = true;
+            string fen = FenGenerator.GenerateFromBoard();
+            string bestmove = _stockfish.GetBestMove(fen);
 
-        if (bestmove != null)
-            StartCoroutine(ApplyMove(bestmove));
-    }
-    public void EndTurn()
-    {
-        GameEvents.RequestAddPlayerMove();
-        enabled = false;
-    }
-    public void Initialize(ChessColor playerColor)
-    {
-        PlayerColor = playerColor;
-        stockfish = new StockfishEngine();
-        stockfish.StartEngine();
-        stockfish.SetSkillLevel(GameConfigStore.CurrentConfig.Difficulty);
-    }
-    private IEnumerator ApplyMove(string uci)
-    {
-        yield return new WaitForSecondsRealtime(Random.Range(1f, 4f));
-        GameManager.Instance.MovePiece(uci);
+            if (bestmove != null)
+                StartCoroutine(ApplyMove(bestmove));
+        }
+        public void EndTurn()
+        {
+            GameEvents.RequestAddPlayerMove();
+            enabled = false;
+        }
+        public void Initialize(ChessColor playerColor)
+        {
+            PlayerColor = playerColor;
+            _stockfish = new StockfishEngine();
+            _stockfish.StartEngine();
+            _stockfish.SetSkillLevel(GameConfigStore.CurrentConfig.Difficulty);
+        }
+        IEnumerator ApplyMove(string uci)
+        {
+            yield return new WaitForSecondsRealtime(Random.Range(1f, 4f));
+            GameManager.Instance.MovePiece(uci);
+        }
     }
 }

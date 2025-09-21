@@ -1,6 +1,7 @@
-using UnityEngine;
-
-public interface ILoadingUI
+namespace Core.Loading
 {
-    void UpdateProgress(float progress);
+    public interface ILoadingUI
+    {
+        void UpdateProgress(float progress);
+    }
 }

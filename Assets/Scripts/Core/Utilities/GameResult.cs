@@ -1,6 +1,9 @@
-public enum GameResult
+namespace Core.Utilities
 {
-    WhiteWin,
-    BlackWin,
-    Draw
+    public enum GameResult
+    {
+        WhiteWin,
+        BlackWin,
+        Draw
+    }
 }

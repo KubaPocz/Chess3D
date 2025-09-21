@@ -1,20 +1,26 @@
+using Game.Board;
+using Game.Logic;
+using Game.Pieces;
 using UnityEngine;
 
-public class MoveMarker : MonoBehaviour
+namespace UI.Gameplay
 {
-    private BoardTile currentTile;
-    private ChessPiece selectedPiece;
-    public void Init(BoardTile tile,ChessPiece piece)
+    public class MoveMarker : MonoBehaviour
     {
-        currentTile = tile;
-        selectedPiece = piece;
-    }
-    private void OnMouseDown()
-    {
-        Debug.Log(selectedPiece);
-        if (selectedPiece != null)
+        BoardTile currentTile;
+        ChessPiece selectedPiece;
+        public void Init(BoardTile tile,ChessPiece piece)
         {
-            GameEvents.RequestMovePiece(UCIHelper.ToUCI(selectedPiece.CurrentTile, currentTile));   
+            currentTile = tile;
+            selectedPiece = piece;
+        }
+        void OnMouseDown()
+        {
+            Debug.Log(selectedPiece);
+            if (selectedPiece != null)
+            {
+                GameEvents.RequestMovePiece(UciHelper.ToUci(selectedPiece.CurrentTile, currentTile));   
+            }
         }
     }
 }

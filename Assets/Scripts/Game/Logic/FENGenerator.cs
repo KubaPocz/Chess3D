@@ -1,53 +1,57 @@
-using UnityEngine;
+using Core.Utilities;
+using Game.Pieces;
 
-public static class FENGenerator
+namespace Game.Logic
 {
-    public static string GenerateFromBoard()
+    public static class FenGenerator
     {
-        var board = BoardManager.Instance.GameBoard;
-        string fen = "";
-        for (int rank = 7; rank >=0; rank--)
+        public static string GenerateFromBoard()
         {
-            int emptyCount = 0;
-            for(int file = 0; file <8;file++)
+            var board = BoardManager.Instance.GameBoard;
+            string fen = "";
+            for (int rank = 7; rank >=0; rank--)
             {
-                var tile = board[file, rank];
-                var piece = tile.CurrentPiece;
+                int emptyCount = 0;
+                for(int file = 0; file <8;file++)
+                {
+                    var tile = board[file, rank];
+                    var piece = tile.CurrentPiece;
 
-                if (piece == null)
-                {
-                    emptyCount++;
-                    continue;
+                    if (piece == null)
+                    {
+                        emptyCount++;
+                        continue;
+                    }
+                    if(emptyCount>0)
+                    {
+                        fen += emptyCount;
+                        emptyCount = 0;
+                    }
+                    fen += GetFenSymbol(piece);
                 }
-                if(emptyCount>0)
-                {
+                if(emptyCount > 0)
                     fen += emptyCount;
-                    emptyCount = 0;
-                }
-                fen += GetFENSymbol(piece);
+                if (rank > 0)
+                    fen += "/";
             }
-            if(emptyCount > 0)
-                fen += emptyCount;
-            if (rank > 0)
-                fen += "/";
+            string turn = GameStats.Instance.CurrentTurnColor == ChessColor.White ? "w" : "b";
+            fen += $" {turn} - - 0 1";
+            return fen;
         }
-        string turn = GameStats.Instance.currentTurnColor == ChessColor.White ? "w" : "b";
-        fen += $" {turn} - - 0 1";
-        return fen;
-    }
-    private static string GetFENSymbol(ChessPiece piece)
-    {
-        string letter = piece.PieceType switch
+        static string GetFenSymbol(ChessPiece piece)
         {
-            PieceType.King => "k",
-            PieceType.Queen => "q",
-            PieceType.Rook => "r",
-            PieceType.Bishop => "b",
-            PieceType.Knight => "n",
-            PieceType.Pawn => "p",
-            _ => "?"
-        };
+            string letter = piece.PieceType switch
+            {
+                PieceType.King => "k",
+                PieceType.Queen => "q",
+                PieceType.Rook => "r",
+                PieceType.Bishop => "b",
+                PieceType.Knight => "n",
+                PieceType.Pawn => "p",
+                _ => "?"
+            };
 
-        return piece.Color == ChessColor.White?letter.ToUpper() : letter;
+            return piece.Color == ChessColor.White?letter.ToUpper() : letter;
+        }
     }
 }

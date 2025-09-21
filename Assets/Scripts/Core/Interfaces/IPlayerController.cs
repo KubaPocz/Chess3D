@@ -1,9 +1,11 @@
-using NUnit.Framework;
-using System;
-using UnityEngine;
-public interface IPlayerController
+using Core.Utilities;
+
+namespace Core.Interfaces
 {
-    void StartTurn();
-    void EndTurn();
-    void Initialize(ChessColor playerColor);
+    public interface IPlayerController
+    {
+        void StartTurn();
+        void EndTurn();
+        void Initialize(ChessColor playerColor);
+    }
 }

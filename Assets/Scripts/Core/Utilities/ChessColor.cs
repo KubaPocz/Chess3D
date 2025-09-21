@@ -1,5 +1,8 @@
-public enum ChessColor
+namespace Core.Utilities
 {
-    White,
-    Black
+    public enum ChessColor
+    {
+        White,
+        Black
+    }
 }

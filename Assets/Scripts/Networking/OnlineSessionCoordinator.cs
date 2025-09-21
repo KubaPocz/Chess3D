@@ -3,94 +3,101 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
-using Unity.Networking.Transport.Relay;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using Core.Utilities;
+using Game.Logic;
 
-public class OnlineSessionCoordinator : NetworkBehaviour
+namespace Networking
 {
-    public static OnlineSessionCoordinator Instance { get; private set; }
-    [SerializeField] UnityTransport transport;
-    [SerializeField] string gameSceneName = "Game";
-    public ChessColor hostColor;
-    private void Awake()
+    public class OnlineSessionCoordinator : NetworkBehaviour
     {
-        DontDestroyOnLoad(this);
-        if(Instance != null && Instance != this)
+        public static OnlineSessionCoordinator Instance { get; private set; }
+        [SerializeField] UnityTransport transport;
+        [SerializeField] string gameSceneName = "Game";
+        public ChessColor hostColor;
+
+        void Awake()
         {
-            Destroy(gameObject);
-            return;
+            DontDestroyOnLoad(this);
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
         }
-        Instance = this;
-    }
 
-    void OnEnable()
-    {
-        GameEvents.HostAllocateRelayRequested += OnHostAllocateRelayRequested;
-        GameEvents.ClientJoinRelayRequested += OnClientJoinRelayRequested;
-
-        GameEvents.OnMovePieceOnlineRequested += MovePieceServerRpc;
-        GameEvents.OnRefreshBoardVisualsOnline += RefreshBoardVisualsClientRpc;
-    }
-    void OnDisable()
-    {
-        GameEvents.HostAllocateRelayRequested -= OnHostAllocateRelayRequested;
-        GameEvents.ClientJoinRelayRequested -= OnClientJoinRelayRequested;
-
-        GameEvents.OnMovePieceOnlineRequested -= MovePieceServerRpc;
-        GameEvents.OnRefreshBoardVisualsOnline -= RefreshBoardVisualsClientRpc;
-    }
-
-    async Task<string> OnHostAllocateRelayRequested(int expectedClients)
-    {
-        try
+        void OnEnable()
         {
-            var alloc = await RelayService.Instance.CreateAllocationAsync(expectedClients);
-            string joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId);
+            GameEvents.HostAllocateRelayRequested += OnHostAllocateRelayRequested;
+            GameEvents.ClientJoinRelayRequested += OnClientJoinRelayRequested;
 
-            var serverData = AllocationUtils.ToRelayServerData(alloc, "dtls");
-            transport.SetRelayServerData(serverData);
-
-            if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
-                NetworkManager.Singleton.StartHost();
-
-            // Host ³aduje scenê przez NGO – klienci zsynchronizuj¹ siê automatycznie
-            NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
-
-            return joinCode;
+            GameEvents.OnMovePieceOnlineRequested += MovePieceServerRpc;
+            GameEvents.OnRefreshBoardVisualsOnline += RefreshBoardVisualsClientRpc;
         }
-        catch (System.Exception ex)
+
+        void OnDisable()
         {
-            Debug.LogError("Host allocate/start failed: " + ex.Message);
-            return null;
-        }
-    }
+            GameEvents.HostAllocateRelayRequested -= OnHostAllocateRelayRequested;
+            GameEvents.ClientJoinRelayRequested -= OnClientJoinRelayRequested;
 
-    async Task OnClientJoinRelayRequested(string joinCode)
-    {
-        try
+            GameEvents.OnMovePieceOnlineRequested -= MovePieceServerRpc;
+            GameEvents.OnRefreshBoardVisualsOnline -= RefreshBoardVisualsClientRpc;
+        }
+
+        async Task<string> OnHostAllocateRelayRequested(int expectedClients)
         {
-            var joinAlloc = await RelayService.Instance.JoinAllocationAsync(joinCode);
-            var clientData = AllocationUtils.ToRelayServerData(joinAlloc, "dtls");
-            transport.SetRelayServerData(clientData);
+            try
+            {
+                var alloc = await RelayService.Instance.CreateAllocationAsync(expectedClients);
+                string joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId);
 
-            if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
-                NetworkManager.Singleton.StartClient();
+                var serverData = AllocationUtils.ToRelayServerData(alloc, "dtls");
+                transport.SetRelayServerData(serverData);
+
+                if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
+                    NetworkManager.Singleton.StartHost();
+
+                NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
+
+                return joinCode;
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Host allocate/start failed: " + ex.Message);
+                return null;
+            }
         }
-        catch (System.Exception ex)
+
+        async Task OnClientJoinRelayRequested(string joinCode)
         {
-            Debug.LogError("Client join failed: " + ex.Message);
-        }
-    }
-    [ServerRpc]
-    public void MovePieceServerRpc(string uci)
-    {
-        GameManager.Instance.MovePiece(uci);
-    }
+            try
+            {
+                var joinAlloc = await RelayService.Instance.JoinAllocationAsync(joinCode);
+                var clientData = AllocationUtils.ToRelayServerData(joinAlloc, "dtls");
+                transport.SetRelayServerData(clientData);
 
-    [ClientRpc]
-    public void RefreshBoardVisualsClientRpc()
-    {
-        BoardManager.Instance.RefreshBoardVisuals();
+                if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
+                    NetworkManager.Singleton.StartClient();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Client join failed: " + ex.Message);
+            }
+        }
+
+        [ServerRpc]
+        public void MovePieceServerRpc(string uci)
+        {
+            GameManager.Instance.MovePiece(uci);
+        }
+
+        [ClientRpc]
+        public void RefreshBoardVisualsClientRpc()
+        {
+            BoardManager.Instance.RefreshBoardVisuals();
+        }
     }
 }

@@ -1,11 +1,14 @@
-public enum GameResultReason
+namespace Core.Utilities
 {
-    Checkmate,              // Szach-mat
-    Stalemate,              // Pat
-    Resignation,            // Poddanie
-    Timeout,                // Przekroczenie czasu
-    ThreefoldRepetition,    // Trzykrotne powtórzenie pozycji
-    FiftyMoveRule,          // Regu³a 50 posuniêæ
-    InsufficientMaterial,   // Niewystarczaj¹cy materia³ do mata
-    Agreement               // Remis za obopóln¹ zgod¹
+    public enum GameResultReason
+    {
+        Checkmate,              // Szach-mat
+        Stalemate,              // Pat
+        Resignation,            // Poddanie
+        Timeout,                // Przekroczenie czasu
+        ThreefoldRepetition,    // Trzykrotne powtorzenie pozycji
+        FiftyMoveRule,          // Regula 50 posuniec
+        InsufficientMaterial,   // Niewystarczajacy material do mata
+        Agreement               // Remis za obopolna zgoda
+    }
 }

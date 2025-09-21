@@ -1,13 +1,16 @@
 using UnityEngine;
 
-public class PanelActivator : MonoBehaviour
+namespace UI.Components
 {
-    public void ActivePanel()
+    public class PanelActivator : MonoBehaviour
     {
-        gameObject.SetActive(true);
-    }
-    public void DisactivePanel()
-    {
-        gameObject.SetActive(false);
+        public void ActivePanel()
+        {
+            gameObject.SetActive(true);
+        }
+        public void DisactivePanel()
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

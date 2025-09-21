@@ -1,333 +1,345 @@
 // asmdef: Game.Networking
-using UnityEngine;
+
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Unity.Services.Core;
+using Core.Config;
+using Core.Utilities;
 using Unity.Services.Authentication;
+using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using UnityEngine;
 
-public class LobbyManager : MonoBehaviour
+namespace Networking
 {
-    string lobbyId;
-    bool isHost;
-    CancellationTokenSource heartbeatCts;
-
-    private ILobbyEvents lobbyEvents;
-    private Lobby currentLobby;
-    const string KEY_STARTED = "started";
-    const string KEY_JOINCODE = "joinCode";
-    void Awake() => DontDestroyOnLoad(gameObject);
-
-    async void Start()
+    public class LobbyManager : MonoBehaviour
     {
-        await UnityServices.InitializeAsync();
-        if (!AuthenticationService.Instance.IsSignedIn)
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-    }
+        string _lobbyId;
+        bool _isHost;
+        CancellationTokenSource _heartbeatCts;
 
-    void OnEnable()
-    {
-        GameEvents.CreateLobbyRequested += OnCreateLobbyRequested;
-        GameEvents.JoinLobbyByCodeRequested += OnJoinByCodeRequested;
-        GameEvents.LeaveOrDeleteLobbyRequested += OnLeaveOrDeleteRequested;
-        GameEvents.OnSwapTeamsRequested += SwapTeams;
-        GameEvents.OnStartGameOnlineRequested += StartGameOnline;
-    }
+        ILobbyEvents _lobbyEvents;
+        Lobby _currentLobby;
+        const string KeyStarted = "started";
+        const string KeyJoincode = "joinCode";
+        void Awake() => DontDestroyOnLoad(gameObject);
 
-    void OnDisable()
-    {
-        GameEvents.CreateLobbyRequested -= OnCreateLobbyRequested;
-        GameEvents.JoinLobbyByCodeRequested -= OnJoinByCodeRequested;
-        GameEvents.LeaveOrDeleteLobbyRequested -= OnLeaveOrDeleteRequested;
-        GameEvents.OnSwapTeamsRequested -= SwapTeams;
-        GameEvents.OnStartGameOnlineRequested -= StartGameOnline;
-
-    }
-
-    async void OnCreateLobbyRequested()
-    {
-        try
+        async void Start()
         {
-            string localName = PlayerPrefs.GetString("PlayerName");
-
-            var lobby = await LobbyService.Instance.CreateLobbyAsync(
-                "Lobby",
-                2,
-                new CreateLobbyOptions
-                {
-                    IsPrivate = false,
-                    Player = new Player
-                    {
-                        Data = new Dictionary<string, PlayerDataObject>
-                        {
-                            { "name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, localName) }
-                        }
-                    },
-                    Data = new Dictionary<string, DataObject>
-                    {
-                        { "hostColor", new DataObject(DataObject.VisibilityOptions.Member, "White") },
-                        { "clientColor", new DataObject(DataObject.VisibilityOptions.Member, "Black") }
-                    }
-                });
-
-            isHost = true;
-            lobbyId = lobby.Id;
-            currentLobby = lobby;
-
-            GameEvents.NotifyCreated(lobby.Id, lobby.LobbyCode);
-            RefreshPlayersUI();
-
-            heartbeatCts?.Cancel();
-            heartbeatCts = new CancellationTokenSource();
-            _ = RunHeartbeat(lobby.Id, heartbeatCts.Token);
-
-            await SubscribeToLobbyEvents(lobby.Id);
-        }
-        catch (LobbyServiceException e)
-        {
-            GameEvents.NotifyError($"Create failed: {e.Reason}");
-        }
-    }
-
-    async void OnJoinByCodeRequested(string code)
-    {
-        var c = code?.Trim().ToUpperInvariant();
-        if (string.IsNullOrEmpty(c) || c.Length < 6)
-        {
-            GameEvents.NotifyError("Nieprawid³owy kod lobby.");
-            return;
+            await UnityServices.InitializeAsync();
+            if (!AuthenticationService.Instance.IsSignedIn)
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            GameConfigStore.CurrentConfig = new GameConfig(GameMode.HumanVsHuman, ChessColor.White);
         }
 
-        try
+        void OnEnable()
         {
-            string localName = PlayerPrefs.GetString("PlayerName");
-
-            var lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(
-                c,
-                new JoinLobbyByCodeOptions
-                {
-                    Player = new Player
-                    {
-                        Data = new Dictionary<string, PlayerDataObject>
-                        {
-                            { "name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, localName) }
-                        }
-                    }
-                });
-
-            isHost = false;
-            lobbyId = lobby.Id;
-            currentLobby = lobby;
-
-            GameEvents.NotifyJoined(lobby.Id, lobby.LobbyCode);
-            RefreshPlayersUI();
-
-            await SubscribeToLobbyEvents(lobby.Id);
+            GameEvents.CreateLobbyRequested += OnCreateLobbyRequested;
+            GameEvents.JoinLobbyByCodeRequested += OnJoinByCodeRequested;
+            GameEvents.LeaveOrDeleteLobbyRequested += OnLeaveOrDeleteRequested;
+            GameEvents.OnSwapTeamsRequested += SwapTeams;
+            GameEvents.OnStartGameOnlineRequested += StartGameOnline;
         }
-        catch (LobbyServiceException e)
+
+        void OnDisable()
         {
-            GameEvents.NotifyError($"Join failed: {e.Reason}");
+            GameEvents.CreateLobbyRequested -= OnCreateLobbyRequested;
+            GameEvents.JoinLobbyByCodeRequested -= OnJoinByCodeRequested;
+            GameEvents.LeaveOrDeleteLobbyRequested -= OnLeaveOrDeleteRequested;
+            GameEvents.OnSwapTeamsRequested -= SwapTeams;
+            GameEvents.OnStartGameOnlineRequested -= StartGameOnline;
+
         }
-    }
 
-    public async void SwapTeams()
-    {
-        try
+        async void OnCreateLobbyRequested()
         {
-            if (!isHost || currentLobby == null || currentLobby.Data == null || currentLobby.Players.Count != 2) return;
-
-            string hostColor = currentLobby.Data.TryGetValue("hostColor", out var hc) ? hc.Value : "White";
-            string clientColor = currentLobby.Data.TryGetValue("clientColor", out var cc) ? cc.Value : "Black";
-            GameConfigStore.CurrentConfig.PlayerColor = hostColor == "White" ? ChessColor.White : ChessColor.Black;
-            await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, new UpdateLobbyOptions
+            try
             {
-                Data = new Dictionary<string, DataObject>
-            {
-                { "hostColor", new DataObject(DataObject.VisibilityOptions.Member, clientColor) },
-                { "clientColor", new DataObject(DataObject.VisibilityOptions.Member, hostColor) }
+                string localName = PlayerPrefs.GetString("PlayerName");
+
+                var lobby = await LobbyService.Instance.CreateLobbyAsync(
+                    "Lobby",
+                    2,
+                    new CreateLobbyOptions
+                    {
+                        IsPrivate = false,
+                        Player = new Player
+                        {
+                            Data = new Dictionary<string, PlayerDataObject>
+                            {
+                                { "name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, localName) }
+                            }
+                        },
+                        Data = new Dictionary<string, DataObject>
+                        {
+                            { "hostColor", new DataObject(DataObject.VisibilityOptions.Member, "White") },
+                            { "clientColor", new DataObject(DataObject.VisibilityOptions.Member, "Black") }
+                        }
+                    });
+
+                _isHost = true;
+                _lobbyId = lobby.Id;
+                _currentLobby = lobby;
+
+                GameEvents.NotifyCreated(lobby.Id, lobby.LobbyCode);
+                RefreshPlayersUI();
+
+                _heartbeatCts?.Cancel();
+                _heartbeatCts = new CancellationTokenSource();
+                _ = RunHeartbeat(lobby.Id, _heartbeatCts.Token);
+
+                await SubscribeToLobbyEvents(lobby.Id);
             }
-            });
-        }
-        catch
-        {
-
-        }
-    }
-    public async void StartGameOnline()
-    {
-        if(!isHost || currentLobby == null)
-        {
-            GameEvents.NotifyError("Tylko host mo¿e rozpocz¹æ grê.");
-            return;
-        }
-        if (currentLobby.Players == null || currentLobby.Players.Count != 2)
-        {
-            GameEvents.NotifyError("Ta gra wymaga dok³adnie 2 graczy.");
-            return;
-        }
-        try
-        {
-            string joinCode = await GameEvents.RequestHostAllocateRelayAsync(1);
-            if (string.IsNullOrEmpty(joinCode))
+            catch (LobbyServiceException e)
             {
-                GameEvents.NotifyError("Nie uda³o siê przygotowaæ sesji sieciowej (Relay).");
+                GameEvents.NotifyError($"Create failed: {e.Reason}");
+            }
+        }
+
+        async void OnJoinByCodeRequested(string code)
+        {
+            var c = code?.Trim().ToUpperInvariant();
+            if (string.IsNullOrEmpty(c) || c.Length < 6)
+            {
+                GameEvents.NotifyError("Nieprawidï¿½owy kod lobby.");
                 return;
             }
-            await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, new UpdateLobbyOptions
+
+            try
             {
-                Data = new Dictionary<string, DataObject>
-            {
-                { KEY_STARTED,  new DataObject(DataObject.VisibilityOptions.Member, "true") },
-                { KEY_JOINCODE, new DataObject(DataObject.VisibilityOptions.Member, joinCode) }
+                string localName = PlayerPrefs.GetString("PlayerName");
+
+                var lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(
+                    c,
+                    new JoinLobbyByCodeOptions
+                    {
+                        Player = new Player
+                        {
+                            Data = new Dictionary<string, PlayerDataObject>
+                            {
+                                { "name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, localName) }
+                            }
+                        }
+                    });
+
+                _isHost = false;
+                _lobbyId = lobby.Id;
+                _currentLobby = lobby;
+
+                GameEvents.NotifyJoined(lobby.Id, lobby.LobbyCode);
+                RefreshPlayersUI();
+
+                await SubscribeToLobbyEvents(lobby.Id);
             }
-            });
-        }
-        catch (LobbyServiceException e)
-        {
-            GameEvents.NotifyError($"StartGameOnline failed (Lobby): {e.Reason}");
-        }
-        catch (System.Exception ex)
-        {
-            GameEvents.NotifyError($"StartGameOnline failed: {ex.Message}");
-        }
-    }
-
-
-    async void OnLeaveOrDeleteRequested()
-    {
-        try
-        {
-            heartbeatCts?.Cancel();
-            if (!string.IsNullOrEmpty(lobbyId))
+            catch (LobbyServiceException e)
             {
-                if (isHost)
-                {
-                    await LobbyService.Instance.DeleteLobbyAsync(lobbyId);
-                    GameEvents.NotifyLeftOrDeleted();
-                }
+                GameEvents.NotifyError($"Join failed: {e.Reason}");
+            }
+        }
+
+        public async void SwapTeams()
+        {
+            try
+            {
+                if (!_isHost || _currentLobby == null || _currentLobby.Data == null || _currentLobby.Players.Count != 2) return;
+
+                string hostColor = _currentLobby.Data.TryGetValue("hostColor", out var hc) ? hc.Value : "White";
+                string clientColor = _currentLobby.Data.TryGetValue("clientColor", out var cc) ? cc.Value : "Black";
+                if (OnlineSessionCoordinator.Instance.hostColor == ChessColor.White)
+                    OnlineSessionCoordinator.Instance.hostColor = ChessColor.Black;
                 else
+                    OnlineSessionCoordinator.Instance.hostColor = ChessColor.White;
+                await LobbyService.Instance.UpdateLobbyAsync(_currentLobby.Id, new UpdateLobbyOptions
                 {
-                    await LobbyService.Instance.RemovePlayerAsync(lobbyId, AuthenticationService.Instance.PlayerId);
-                    GameEvents.NotifyLeftOrDeleted();
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        { "hostColor", new DataObject(DataObject.VisibilityOptions.Member, clientColor) },
+                        { "clientColor", new DataObject(DataObject.VisibilityOptions.Member, hostColor) }
+                    }
+                });
+            }
+            catch
+            {
+
+            }
+        }
+        public async void StartGameOnline()
+        {
+            if (!_isHost || _currentLobby == null)
+            {
+                GameEvents.NotifyError("Tylko host moï¿½e rozpoczï¿½ï¿½ grï¿½.");
+                return;
+            }
+            if (_currentLobby.Players == null || _currentLobby.Players.Count != 2)
+            {
+                GameEvents.NotifyError("Ta gra wymaga dokï¿½adnie 2 graczy.");
+                return;
+            }
+            try
+            {
+                Debug.Log($"[LobbyManager.StartGameOnline] executing at t={Time.time}");
+                string joinCode = await GameEvents.RequestHostAllocateRelayAsync(1);
+                GameConfigStore.CurrentConfig.PlayerColor = OnlineSessionCoordinator.Instance.hostColor;
+                if (string.IsNullOrEmpty(joinCode))
+                {
+                    GameEvents.NotifyError("Nie udaï¿½o siï¿½ przygotowaï¿½ sesji sieciowej (Relay).");
+                    return;
+                }
+                await LobbyService.Instance.UpdateLobbyAsync(_currentLobby.Id, new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        { KeyStarted,  new DataObject(DataObject.VisibilityOptions.Member, "true") },
+                        { KeyJoincode, new DataObject(DataObject.VisibilityOptions.Member, joinCode) }
+                    }
+                });
+            }
+            catch (LobbyServiceException e)
+            {
+                GameEvents.NotifyError($"StartGameOnline failed (Lobby): {e.Reason}");
+            }
+            catch (System.Exception ex)
+            {
+                GameEvents.NotifyError($"StartGameOnline failed: {ex.Message}");
+            }
+        }
+
+
+        async void OnLeaveOrDeleteRequested()
+        {
+            try
+            {
+                _heartbeatCts?.Cancel();
+                if (!string.IsNullOrEmpty(_lobbyId))
+                {
+                    if (_isHost)
+                    {
+                        await LobbyService.Instance.DeleteLobbyAsync(_lobbyId);
+                        GameEvents.NotifyLeftOrDeleted();
+                    }
+                    else
+                    {
+                        await LobbyService.Instance.RemovePlayerAsync(_lobbyId, AuthenticationService.Instance.PlayerId);
+                        GameEvents.NotifyLeftOrDeleted();
+                    }
+                }
+            }
+            catch (LobbyServiceException e)
+            {
+                GameEvents.NotifyError($"Leave/Delete failed: {e.Reason}");
+            }
+            finally
+            {
+                _isHost = false;
+                _lobbyId = null;
+                _currentLobby = null;
+                if (_lobbyEvents != null)
+                {
+                    await _lobbyEvents.UnsubscribeAsync();
+                    _lobbyEvents = null;
                 }
             }
         }
-        catch (LobbyServiceException e)
+
+        async Task RunHeartbeat(string id, CancellationToken ct)
         {
-            GameEvents.NotifyError($"Leave/Delete failed: {e.Reason}");
-        }
-        finally
-        {
-            isHost = false;
-            lobbyId = null;
-            currentLobby = null;
-            if (lobbyEvents != null)
+            while (!ct.IsCancellationRequested)
             {
-                await lobbyEvents.UnsubscribeAsync();
-                lobbyEvents = null;
+                try { await LobbyService.Instance.SendHeartbeatPingAsync(id); }
+                catch { break; }
+                try { await Task.Delay(15000, ct); } catch { break; }
             }
         }
-    }
 
-    async Task RunHeartbeat(string id, CancellationToken ct)
-    {
-        while (!ct.IsCancellationRequested)
+        async Task SubscribeToLobbyEvents(string lobbyId)
         {
-            try { await LobbyService.Instance.SendHeartbeatPingAsync(id); }
-            catch { break; }
-            try { await Task.Delay(15000, ct); } catch { break; }
-        }
-    }
+            if (_lobbyEvents != null)
+            {
+                await _lobbyEvents.UnsubscribeAsync();
+                _lobbyEvents = null;
+            }
 
-    async Task SubscribeToLobbyEvents(string lobbyId)
-    {
-        if (lobbyEvents != null)
-        {
-            await lobbyEvents.UnsubscribeAsync();
-            lobbyEvents = null;
-        }
+            var callbacks = new LobbyEventCallbacks();
+            callbacks.LobbyChanged += OnLobbyChanged;
+            callbacks.LobbyDeleted += OnLobbyDeleted;
+            callbacks.KickedFromLobby += OnKickedFromLobby;
+            callbacks.LobbyEventConnectionStateChanged += OnLobbyEventConnectionStateChanged;
 
-        var callbacks = new LobbyEventCallbacks();
-        callbacks.LobbyChanged += OnLobbyChanged;
-        callbacks.LobbyDeleted += OnLobbyDeleted;
-        callbacks.KickedFromLobby += OnKickedFromLobby;
-        callbacks.LobbyEventConnectionStateChanged += OnLobbyEventConnectionStateChanged;
-
-        lobbyEvents = await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobbyId, callbacks);
-        await lobbyEvents.SubscribeAsync();
-    }
-
-    void OnLobbyChanged(ILobbyChanges changes)
-    {
-        if (currentLobby == null) return;
-        changes.ApplyToLobby(currentLobby);
-        RefreshPlayersUI();
-
-        if (!isHost &&
-        currentLobby.Data != null &&
-        currentLobby.Data.TryGetValue(KEY_STARTED, out var startedObj) &&
-        startedObj.Value == "true" &&
-        currentLobby.Data.TryGetValue(KEY_JOINCODE, out var jcObj) &&
-        !string.IsNullOrEmpty(jcObj.Value))
-        {
-            // Poproœ koordynatora sieci o JoinRelay + StartClient
-            _ = GameEvents.RequestClientJoinRelayAsync(jcObj.Value);
-        }
-    }
-
-    void OnLobbyDeleted()
-    {
-        if (!isHost)
-        {
-            GameEvents.NotifyLobbyClosedByHost();
-        }
-    }
-
-    void OnKickedFromLobby()
-    {
-        GameEvents.NotifyLeftOrDeleted();
-    }
-
-    void OnLobbyEventConnectionStateChanged(LobbyEventConnectionState state)
-    {
-        Debug.Log($"Lobby event connection state: {state}");
-    }
-
-    void OnApplicationQuit() => OnLeaveOrDeleteRequested();
-    void OnDestroy() => OnLeaveOrDeleteRequested();
-
-    void RefreshPlayersUI()
-    {
-        if (currentLobby == null) return;
-
-        var players = new List<string>();
-        var seenNames = new HashSet<string>();
-
-        string hostColor = currentLobby.Data.TryGetValue("hostColor", out var hc) ? hc.Value : "?";
-        string clientColor = currentLobby.Data.TryGetValue("clientColor", out var cc) ? cc.Value : "?";
-
-        foreach (var p in currentLobby.Players)
-        {
-            string name = p.Data != null && p.Data.TryGetValue("name", out var n) ? n.Value : "Anon";
-
-            if (seenNames.Contains(name))
-                name = name + "*";
-
-            string color = "?";
-
-            // jeœli to gracz hosta
-            if (p.Id == currentLobby.HostId)
-                color = hostColor;
-            else
-                color = clientColor;
-
-            players.Add($"{name} ({color})");
-            seenNames.Add(name);
+            _lobbyEvents = await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobbyId, callbacks);
+            await _lobbyEvents.SubscribeAsync();
         }
 
-        GameEvents.NotifyPlayersListUpdated(players);
-    }
+        void OnLobbyChanged(ILobbyChanges changes)
+        {
+            if (_currentLobby == null) return;
+            changes.ApplyToLobby(_currentLobby);
+            RefreshPlayersUI();
 
+            if (!_isHost &&
+                _currentLobby.Data != null &&
+                _currentLobby.Data.TryGetValue(KeyStarted, out var startedObj) &&
+                startedObj.Value == "true" &&
+                _currentLobby.Data.TryGetValue(KeyJoincode, out var jcObj) &&
+                !string.IsNullOrEmpty(jcObj.Value))
+            {
+                // Poproï¿½ koordynatora sieci o JoinRelay + StartClient
+                _ = GameEvents.RequestClientJoinRelayAsync(jcObj.Value);
+            }
+        }
+
+        void OnLobbyDeleted()
+        {
+            if (!_isHost)
+            {
+                GameEvents.NotifyLobbyClosedByHost();
+            }
+        }
+
+        void OnKickedFromLobby()
+        {
+            GameEvents.NotifyLeftOrDeleted();
+        }
+
+        void OnLobbyEventConnectionStateChanged(LobbyEventConnectionState state)
+        {
+            Debug.Log($"Lobby event connection state: {state}");
+        }
+
+        void OnApplicationQuit() => OnLeaveOrDeleteRequested();
+        void OnDestroy() => OnLeaveOrDeleteRequested();
+
+        void RefreshPlayersUI()
+        {
+            if (_currentLobby == null) return;
+
+            var players = new List<string>();
+            var seenNames = new HashSet<string>();
+
+            string hostColor = _currentLobby.Data.TryGetValue("hostColor", out var hc) ? hc.Value : "?";
+            string clientColor = _currentLobby.Data.TryGetValue("clientColor", out var cc) ? cc.Value : "?";
+
+            foreach (var p in _currentLobby.Players)
+            {
+                string name = p.Data != null && p.Data.TryGetValue("name", out var n) ? n.Value : "Anon";
+
+                if (seenNames.Contains(name))
+                    name = name + "*";
+
+                string color = "?";
+
+                // jeï¿½li to gracz hosta
+                if (p.Id == _currentLobby.HostId)
+                    color = hostColor;
+                else
+                    color = clientColor;
+
+                players.Add($"{name} ({color})");
+                seenNames.Add(name);
+            }
+
+            GameEvents.NotifyPlayersListUpdated(players);
+        }
+
+    }
 }

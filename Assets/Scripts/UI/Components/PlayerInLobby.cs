@@ -1,13 +1,17 @@
+using Core.Utilities;
 using TMPro;
 using UnityEngine;
 
-public class PlayerInLobby : MonoBehaviour
+namespace UI.Components
 {
-    public string playerName = "";
-    public ChessColor playerColor = ChessColor.White;
-    public void UpdatePlayerInfo(string playerName)
+    public class PlayerInLobby : MonoBehaviour
     {
-        playerName = playerName.Trim();
-        gameObject.GetComponent<TextMeshProUGUI>().text = playerName;
+        public string playerName = "";
+        public ChessColor playerColor = ChessColor.White;
+        public void UpdatePlayerInfo(string playerName)
+        {
+            playerName = playerName.Trim();
+            gameObject.GetComponent<TextMeshProUGUI>().text = playerName;
+        }
     }
 }

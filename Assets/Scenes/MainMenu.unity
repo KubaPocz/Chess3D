@@ -1235,6 +1235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad930141b2c976f4d84730237701d200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MenuCamera: {fileID: 932293931}
   MainPanelAnimator: {fileID: 1311548479}
   PlayButton: {fileID: 719893555}
   OptionsButton: {fileID: 1190417024}
@@ -7776,7 +7777,7 @@ MonoBehaviour:
     LoadSceneTimeOut: 120
     SpawnTimeout: 10
     EnableNetworkLogs: 1
-    NetworkTopology: 0
+    NetworkTopology: 1
     UseCMBService: 0
     AutoSpawnPlayerPrefabClientSide: 1
     NetworkMessageMetrics: 1
@@ -12774,6 +12775,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1847219700}
+  - component: {fileID: 1847219701}
   - component: {fileID: 1847219699}
   m_Layer: 0
   m_Name: OnlineSessionCoordinator
@@ -12794,8 +12796,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ceb36d584e2b7848b2fd7031beb7291, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   transport: {fileID: 1080077080}
   gameSceneName: GameBoard
+  hostColor: 0
 --- !u!4 &1847219700
 Transform:
   m_ObjectHideFlags: 0
@@ -12811,6 +12815,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1847219701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847219698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2524747411
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &1875506033
 GameObject:
   m_ObjectHideFlags: 0
@@ -13842,6 +13871,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2116825183}
   - component: {fileID: 2116825182}
+  - component: {fileID: 2116825184}
   m_Layer: 0
   m_Name: LobbyManager
   m_TagString: Untagged
@@ -13876,6 +13906,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2116825184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2116825181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3595305228
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &2129484773
 GameObject:
   m_ObjectHideFlags: 0

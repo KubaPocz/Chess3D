@@ -1,100 +1,106 @@
+using Core.Utilities;
+using Game.Logic;
+using Game.Pieces;
 using UnityEngine;
 
-public class BoardLoader : MonoBehaviour
+namespace Game.Board
 {
-    [Header("Board frame")]
-    [SerializeField] private GameObject boardFrame;
-
-    [Header("Tiles")]
-    [SerializeField] private GameObject tilesParent;
-    [SerializeField] private GameObject prefabTile;
-
-    [Header("Pieces")]
-    [SerializeField] private GameObject piecesParent;
-    [SerializeField] private GameObject pawnPrefab;
-    [SerializeField] private GameObject rookPrefab;
-    [SerializeField] private GameObject knightPrefab;
-    [SerializeField] private GameObject bishopPrefab;
-    [SerializeField] private GameObject queenPrefab;
-    [SerializeField] private GameObject kingPrefab;
-
-    private Material tileWhite;
-    private Material tileBlack;
-    private BoardTile[,] tiles = new BoardTile[8, 8];
-
-    void Start()
+    public class BoardLoader : MonoBehaviour
     {
-        tileWhite = BoardManager.Instance.tileWhite;
-        tileBlack = BoardManager.Instance.tileBlack;
-        GenerateBoard();
-        SpawnAllPieces();
-        BoardManager.Instance.SetGameBoard(tiles);
-    }
-    void GenerateBoard()
-    {
-        for (int x = 0; x < 8; x++)
+        [Header("Board frame")]
+        [SerializeField] GameObject boardFrame;
+
+        [Header("Tiles")]
+        [SerializeField] GameObject tilesParent;
+        [SerializeField] GameObject prefabTile;
+
+        [Header("Pieces")]
+        [SerializeField] GameObject piecesParent;
+        [SerializeField] GameObject pawnPrefab;
+        [SerializeField] GameObject rookPrefab;
+        [SerializeField] GameObject knightPrefab;
+        [SerializeField] GameObject bishopPrefab;
+        [SerializeField] GameObject queenPrefab;
+        [SerializeField] GameObject kingPrefab;
+
+        Material _tileWhite;
+        Material _tileBlack;
+        BoardTile[,] _tiles = new BoardTile[8, 8];
+
+        void Start()
         {
-            for (int z = 0; z < 8; z++)
+            _tileWhite = BoardManager.Instance.tileWhite;
+            _tileBlack = BoardManager.Instance.tileBlack;
+            GenerateBoard();
+            SpawnAllPieces();
+            BoardManager.Instance.SetGameBoard(_tiles);
+        }
+        void GenerateBoard()
+        {
+            for (int x = 0; x < 8; x++)
             {
-                Vector3 position = new Vector3(x, 0, z);
-                GameObject tile = Instantiate(prefabTile, position, Quaternion.identity, tilesParent.transform);
-                Renderer tile_Renderer = tile.GetComponent<Renderer>();
-                BoardTile tile_boardTile = tile.GetComponent<BoardTile>();
-                ChessColor color = (x + z) % 2 == 1 ? ChessColor.White : ChessColor.Black;
-                Material material = (x + z) % 2 == 1 ? tileWhite : tileBlack;
-                tile_boardTile.Init(x, z, tile_Renderer, color, material);
-                tiles[x,z] = tile_boardTile;
+                for (int z = 0; z < 8; z++)
+                {
+                    Vector3 position = new Vector3(x, 0, z);
+                    GameObject tile = Instantiate(prefabTile, position, Quaternion.identity, tilesParent.transform);
+                    var tileRenderer = tile.GetComponent<Renderer>();
+                    var tileBoardTile = tile.GetComponent<BoardTile>();
+                    ChessColor color = (x + z) % 2 == 1 ? ChessColor.White : ChessColor.Black;
+                    Material material = (x + z) % 2 == 1 ? _tileWhite : _tileBlack;
+                    tileBoardTile.Init(x, z, tileRenderer, color, material);
+                    _tiles[x,z] = tileBoardTile;
+                }
             }
         }
-    }
 
-    void SpawnAllPieces()
-    {
-        for (int x = 0; x < 8; x++)
+        void SpawnAllPieces()
         {
-            SpawnPiece(pawnPrefab, ChessColor.White, x, 1);
-            SpawnPiece(pawnPrefab, ChessColor.Black, x, 6);
+            for (int x = 0; x < 8; x++)
+            {
+                SpawnPiece(pawnPrefab, ChessColor.White, x, 1);
+                SpawnPiece(pawnPrefab, ChessColor.Black, x, 6);
+            }
+            //Rook's
+            SpawnPiece(rookPrefab, ChessColor.White, 0, 0);
+            SpawnPiece(rookPrefab, ChessColor.White, 7, 0);
+
+            SpawnPiece(rookPrefab, ChessColor.Black, 0, 7);
+            SpawnPiece(rookPrefab, ChessColor.Black, 7, 7);
+
+            //Knight's
+            SpawnPiece(knightPrefab, ChessColor.White, 1, 0);
+            SpawnPiece(knightPrefab, ChessColor.White, 6, 0);
+
+            SpawnPiece(knightPrefab, ChessColor.Black, 1, 7);
+            SpawnPiece(knightPrefab, ChessColor.Black, 6, 7);
+
+            //Bishop's
+            SpawnPiece(bishopPrefab, ChessColor.White, 2, 0);
+            SpawnPiece(bishopPrefab, ChessColor.White, 5, 0);
+
+            SpawnPiece(bishopPrefab, ChessColor.Black, 2, 7);
+            SpawnPiece(bishopPrefab, ChessColor.Black, 5, 7);
+
+            //Queen's
+            SpawnPiece(queenPrefab, ChessColor.White, 3, 0);
+            SpawnPiece(queenPrefab, ChessColor.Black, 3, 7);
+
+
+            //King's
+            SpawnPiece(kingPrefab, ChessColor.White, 4, 0);
+            SpawnPiece(kingPrefab, ChessColor.Black, 4, 7);
+
         }
-        //Rook's
-        SpawnPiece(rookPrefab, ChessColor.White, 0, 0);
-        SpawnPiece(rookPrefab, ChessColor.White, 7, 0);
+        void SpawnPiece(GameObject piecePrefab,ChessColor color, int x, int y)
+        {
+            GameObject pieceObj = Instantiate(piecePrefab,piecesParent.transform);
+            ChessPiece piece = pieceObj.GetComponent<ChessPiece>();
 
-        SpawnPiece(rookPrefab, ChessColor.Black, 0, 7);
-        SpawnPiece(rookPrefab, ChessColor.Black, 7, 7);
+            BoardTile tile = _tiles[x,y];
+            piece.Initialize(color, tile, _tiles);
+            tile.SetPiece(piece);
 
-        //Knight's
-        SpawnPiece(knightPrefab, ChessColor.White, 1, 0);
-        SpawnPiece(knightPrefab, ChessColor.White, 6, 0);
-
-        SpawnPiece(knightPrefab, ChessColor.Black, 1, 7);
-        SpawnPiece(knightPrefab, ChessColor.Black, 6, 7);
-
-        //Bishop's
-        SpawnPiece(bishopPrefab, ChessColor.White, 2, 0);
-        SpawnPiece(bishopPrefab, ChessColor.White, 5, 0);
-
-        SpawnPiece(bishopPrefab, ChessColor.Black, 2, 7);
-        SpawnPiece(bishopPrefab, ChessColor.Black, 5, 7);
-
-        //Queen's
-        SpawnPiece(queenPrefab, ChessColor.White, 3, 0);
-        SpawnPiece(queenPrefab, ChessColor.Black, 3, 7);
-
-
-        //King's
-        SpawnPiece(kingPrefab, ChessColor.White, 4, 0);
-        SpawnPiece(kingPrefab, ChessColor.Black, 4, 7);
-
-    }
-    void SpawnPiece(GameObject piecePrefab,ChessColor color, int x, int y)
-    {
-        GameObject pieceObj = Instantiate(piecePrefab,piecesParent.transform);
-        ChessPiece piece = pieceObj.GetComponent<ChessPiece>();
-
-        BoardTile tile = tiles[x,y];
-        piece.Initialize(color, tile, tiles);
-        tile.SetPiece(piece);
-
-        BoardManager.Instance.allPieces.Add(piece);
+            BoardManager.Instance.allPieces.Add(piece);
+        }
     }
 }

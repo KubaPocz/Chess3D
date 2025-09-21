@@ -1,55 +1,65 @@
+using System;
+using Core.Config;
+using Core.Interfaces;
+using Core.Utilities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameSetupManager : MonoBehaviour
+namespace Game.Boot
 {
-    public static GameSetupManager Instance { get; private set; }
-
-    [SerializeField] public GameObject humanPrefab;
-    [SerializeField] public GameObject botPrefab;
-    [SerializeField] public Camera whiteCamera;
-    [SerializeField] public Camera blackCamera;
-
-    public IPlayerController player1 { get; private set; }
-    public IPlayerController player2 { get; private set; }
-    private void Awake()
+    public class GameSetupManager : MonoBehaviour
     {
-        Debug.Log($"[GameSetupManager.Awake] executing at t={Time.time}");
+        public static GameSetupManager Instance { get; private set; }
 
-        if (Instance != null)
+        [SerializeField] public GameObject humanPrefab;
+        [SerializeField] public GameObject botPrefab;
+        [SerializeField] public Camera whiteCamera;
+        [SerializeField] public Camera blackCamera;
+
+        public IPlayerController Player1 { get;  set; }
+        public IPlayerController Player2 { get;  set; }
+        public static event Action<IPlayerController, IPlayerController> OnPlayersReady;
+        void Awake()
         {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
+            Debug.Log($"[GameSetupManager.Awake] executing at t={Time.time}");
 
-        switch (GameConfigStore.CurrentConfig.GameMode)
+            if (Instance != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+
+            switch (GameConfigStore.CurrentConfig.GameMode)
+            {
+                case (GameMode.HumanVsHuman):
+                    SceneManager.LoadScene("UI_Online", LoadSceneMode.Additive);
+                    break;
+                case (GameMode.HumanVsBot):
+                    Player1 = Instantiate(humanPrefab).GetComponent<IPlayerController>();
+                    Player2 = Instantiate(botPrefab).GetComponent<IPlayerController>();
+                    SceneManager.LoadScene("UI_Offline", LoadSceneMode.Additive);
+                    break;
+                default:
+                    throw new Exception("Unsupported game mode.");
+            }
+            whiteCamera.gameObject.SetActive(GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White);
+            blackCamera.gameObject.SetActive(GameConfigStore.CurrentConfig.PlayerColor == ChessColor.Black);
+        }
+
+        public void RegisterPlayer(IPlayerController controller)
         {
-            case (GameMode.HumanVsHuman):
-                player1 = Instantiate(humanPrefab).GetComponent<IPlayerController>();
-                player2 = Instantiate(humanPrefab).GetComponent<IPlayerController>();
-                SceneManager.LoadScene("UI_Online", LoadSceneMode.Additive);
-                break;
-            case (GameMode.HumanVsBot):
-                player1 = Instantiate(humanPrefab).GetComponent<IPlayerController>();
-                player2 = Instantiate(botPrefab).GetComponent<IPlayerController>();
-                SceneManager.LoadScene("UI_Offline", LoadSceneMode.Additive);
-                //setting cameras
-                whiteCamera.gameObject.SetActive(GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White);
-                blackCamera.gameObject.SetActive(GameConfigStore.CurrentConfig.PlayerColor == ChessColor.Black);
+            if (Player1 == null) Player1 = controller;
+            else if (Player2 == null) Player2 = controller;
 
-                break;
-            default:
-                throw new System.Exception("Unsupported game mode.");
+            if (Player1 != null && Player2 != null)
+            {
+                OnPlayersReady?.Invoke(Player1, Player2);
+            }
         }
-        ChessColor player1Color = GameConfigStore.CurrentConfig.PlayerColor;
-        ChessColor player2Color = GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White ? ChessColor.Black : ChessColor.White;
-
-        player1.Initialize(player1Color);
-        player2.Initialize(player2Color);
-    }
-    private void OnDestroy()
-    {
-        Instance = null;
+        void OnDestroy()
+        {
+            Instance = null;
+        }
     }
 }

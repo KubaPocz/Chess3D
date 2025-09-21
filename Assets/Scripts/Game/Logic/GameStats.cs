@@ -1,58 +1,63 @@
+using Core.Config;
+using Core.Utilities;
 using UnityEngine;
 
-public class GameStats : MonoBehaviour
+namespace Game.Logic
 {
-    public static GameStats Instance;
-    public int whiteMoves {  get; private set; }
-    public int blackMoves { get; private set; }
-    public ChessColor currentTurnColor {  get; set; }
-    public float whiteTime {  get; private set; }
-    public float blackTime {  get; private set; }
+    public class GameStats : MonoBehaviour
+    {
+        public static GameStats Instance;
+        public int WhiteMoves {  get; private set; }
+        public int BlackMoves { get; private set; }
+        public ChessColor CurrentTurnColor {  get; set; }
+        public float WhiteTime {  get; private set; }
+        public float BlackTime {  get; private set; }
 
 
-    private void Awake()
-    {
-        if(Instance != null && Instance != this)
+        void Awake()
         {
-            Destroy(gameObject);
-            return;
+            if(Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            CurrentTurnColor = ChessColor.White;
+            WhiteMoves = 0;
+            BlackMoves = 0;
+            if(GameConfigStore.CurrentConfig.GameMode == GameMode.HumanVsHuman)
+            {
+                //do ewentualnej zmiany w ustawieniach gry w lobby
+                WhiteTime = 15f;
+                BlackTime = 15f;
+            }
         }
-        Instance = this;
-        currentTurnColor = ChessColor.White;
-        whiteMoves = 0;
-        blackMoves = 0;
-        if(GameConfigStore.CurrentConfig.GameMode == GameMode.HumanVsHuman)
+        void Start()
         {
-            //do ewentualnej zmiany w ustawieniach gry w lobby
-            whiteTime = 15f;
-            blackTime = 15f;
+            GameEvents.OnChangeTurnRequested += ChangeCurrentTurn;
+            GameEvents.OnAddPlayerMoveRequested += AddPlayerMoves;
         }
-    }
-    private void Start()
-    {
-        GameEvents.OnChangeTurnRequested += ChangeCurrentTurn;
-        GameEvents.OnAddPlayerMoveRequested += AddPlayerMoves;
-    }
-    private void AddPlayerMoves()
-    {
-        if (currentTurnColor == ChessColor.White)
-            AddWhiteMoves();
-        else
-            AddBlackMoves();
-    }
-    private void AddWhiteMoves()
-    {
-        whiteMoves++;
-    }
-    private void AddBlackMoves()
-    {
-        blackMoves++;
-    }
-    private void ChangeCurrentTurn()
-    {
-        if (currentTurnColor == ChessColor.White)
-            currentTurnColor = ChessColor.Black;
-        else
-            currentTurnColor = ChessColor.White;
+        void AddPlayerMoves()
+        {
+            if (CurrentTurnColor == ChessColor.White)
+                AddWhiteMoves();
+            else
+                AddBlackMoves();
+        }
+        void AddWhiteMoves()
+        {
+            WhiteMoves++;
+        }
+        void AddBlackMoves()
+        {
+            BlackMoves++;
+        }
+        void ChangeCurrentTurn()
+        {
+            if (CurrentTurnColor == ChessColor.White)
+                CurrentTurnColor = ChessColor.Black;
+            else
+                CurrentTurnColor = ChessColor.White;
+        }
     }
 }

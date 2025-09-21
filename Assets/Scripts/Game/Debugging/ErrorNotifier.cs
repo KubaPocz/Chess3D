@@ -1,28 +1,31 @@
 using UnityEngine;
 
-public class ErrorNotifier : MonoBehaviour
+namespace Game.Debugging
 {
-    static ErrorNotifier Instance;
-    private void Awake()
+    public class ErrorNotifier : MonoBehaviour
     {
-        if(Instance != null)
+        static ErrorNotifier _instance;
+        void Awake()
         {
-            Destroy(this.gameObject);
-            return;
+            if(_instance != null)
+            {
+                Destroy(this.gameObject);
+                return;
+            }
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
-    private void OnEnable()
-    {
-        GameEvents.OnNotifyError += LogError;
-    }
-    private void OnDisable()
-    {
-        GameEvents.OnNotifyError -= LogError;
-    }
-    private void LogError(string error)
-    {
-        Debug.Log(error);
+        void OnEnable()
+        {
+            GameEvents.OnNotifyError += LogError;
+        }
+        void OnDisable()
+        {
+            GameEvents.OnNotifyError -= LogError;
+        }
+        void LogError(string error)
+        {
+            Debug.Log(error);
+        }
     }
 }

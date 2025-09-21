@@ -1,50 +1,52 @@
 using System.Collections;
-using TMPro;
+using Core.Loading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
-public class SceneLoader : MonoBehaviour
+namespace Core.Boot
 {
-    public static SceneLoader Instance;
-    public static string SceneToLoad;
-    private static ILoadingUI loadingUI;
-    private void Awake()
+    public class SceneLoader : MonoBehaviour
     {
-        if(Instance != null && Instance != this)
+        public static SceneLoader Instance;
+        public static string SceneToLoad;
+        static ILoadingUI _loadingUI;
+        void Awake()
         {
-            Destroy(gameObject);
-            return;
+            if(Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
         }
-        Instance = this;
-    }
-    private void Start()
-    {
-        StartCoroutine(LoadSceneAsync(SceneToLoad));
-    }
-    public static void SetLoadingUI(ILoadingUI ui)
-    {
-        loadingUI = ui;
-    }
-    public static void UpdateProgress(float progress)
-    {
-        loadingUI?.UpdateProgress(progress);
-    }
-    private IEnumerator LoadSceneAsync(string SceneToLoad)
-    {
-        yield return null;
-
-        AsyncOperation asyncLoading = SceneManager.LoadSceneAsync(SceneToLoad);
-        asyncLoading.allowSceneActivation = false;
-        
-        while (asyncLoading.progress<0.9f)
+        void Start()
         {
-            float progress = Mathf.Clamp01(asyncLoading.progress / 0.9f);
-            UpdateProgress(progress);
+            StartCoroutine(LoadSceneAsync(SceneToLoad));
+        }
+        public static void SetLoadingUI(ILoadingUI ui)
+        {
+            _loadingUI = ui;
+        }
+        public static void UpdateProgress(float progress)
+        {
+            _loadingUI?.UpdateProgress(progress);
+        }
+        IEnumerator LoadSceneAsync(string SceneToLoad)
+        {
             yield return null;
+
+            AsyncOperation asyncLoading = SceneManager.LoadSceneAsync(SceneToLoad);
+            asyncLoading.allowSceneActivation = false;
+        
+            while (asyncLoading.progress<0.9f)
+            {
+                float progress = Mathf.Clamp01(asyncLoading.progress / 0.9f);
+                UpdateProgress(progress);
+                yield return null;
+            }
+            UpdateProgress(1f);
+            yield return new WaitForSeconds(0.5f);
+            asyncLoading.allowSceneActivation = true;
         }
-        UpdateProgress(1f);
-        yield return new WaitForSeconds(0.5f);
-        asyncLoading.allowSceneActivation = true;
     }
 }

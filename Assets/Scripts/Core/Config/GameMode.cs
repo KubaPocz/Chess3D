@@ -1,7 +1,8 @@
-using UnityEngine;
-
-public enum GameMode
+namespace Core.Config
 {
-    HumanVsHuman,
-    HumanVsBot
+    public enum GameMode
+    {
+        HumanVsHuman,
+        HumanVsBot
+    }
 }

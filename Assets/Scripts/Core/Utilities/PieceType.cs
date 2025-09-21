@@ -1,9 +1,12 @@
-public enum PieceType
+namespace Core.Utilities
 {
-    Pawn,
-    Rook,
-    Knight,
-    Bishop,
-    Queen,
-    King
+    public enum PieceType
+    {
+        Pawn,
+        Rook,
+        Knight,
+        Bishop,
+        Queen,
+        King
+    }
 }

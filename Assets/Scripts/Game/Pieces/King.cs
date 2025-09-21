@@ -1,29 +1,35 @@
 using System.Collections.Generic;
+using Core.Utilities;
+using Game.Board;
+using Game.Logic;
 using UnityEngine;
 
-public class King:ChessPiece
+namespace Game.Pieces
 {
-    public override void SetPieceType() => PieceType = PieceType.King;
-    public override List<BoardTile> GetAvailableMoves(bool includeIllegal = false)
+    public class King:ChessPiece
     {
-        List<BoardTile> moves = new();
-
-        Vector2Int position = CurrentTile.GridPosition;
-        for (int x = position.x - 1; x <= position.x + 1; x++)
+        public override void SetPieceType() => PieceType = PieceType.King;
+        public override List<BoardTile> GetAvailableMoves(bool includeIllegal = false)
         {
-            for (int y = position.y - 1; y <= position.y + 1; y++)
-            {
-                if (!IsInsideBoard(x, y)) continue;
-                if (x == position.x && y == position.y) continue;
+            List<BoardTile> moves = new();
 
-                if (IsEmpty(x, y) || IsEnemy(x, y))
+            Vector2Int position = CurrentTile.GridPosition;
+            for (int x = position.x - 1; x <= position.x + 1; x++)
+            {
+                for (int y = position.y - 1; y <= position.y + 1; y++)
                 {
-                    if (includeIllegal || !BoardManager.Instance.IsTileUnderAttack(Board[x, y], Color))
-                        moves.Add(Board[x, y]);
+                    if (!IsInsideBoard(x, y)) continue;
+                    if (x == position.x && y == position.y) continue;
+
+                    if (IsEmpty(x, y) || IsEnemy(x, y))
+                    {
+                        if (includeIllegal || !BoardManager.Instance.IsTileUnderAttack(Board[x, y], Color))
+                            moves.Add(Board[x, y]);
+                    }
                 }
             }
-        }
 
-        return moves;
+            return moves;
+        }
     }
 }
