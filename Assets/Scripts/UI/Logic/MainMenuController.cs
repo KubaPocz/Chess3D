@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Utilities;
+using Game;
 using TMPro;
 using UI.Components;
 using UnityEngine;
@@ -90,8 +91,8 @@ namespace UI.Logic
 
             //LobbyPanel
             BackToOnlinePanelLobby.onClick.AddListener(() => { GameEvents.RequestHidePanel(LobbyPanelAnimator, OnlinePlayPanelAnimator); LeaveLobby(); });
-            SwapTeamsButtton.onClick.AddListener(() => GameEvents.RequestSwapTeams());
-            StartGameOnlineButton.onClick.AddListener(() =>  GameEvents.RequestStartGameOnline());
+            SwapTeamsButtton.onClick.AddListener(GameEvents.RequestSwapTeams);
+            StartGameOnlineButton.onClick.AddListener(GameEvents.RequestStartGameOnline);
 
             PlayPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();
             ProfileCreationPanelAnimator.gameObject.GetComponent<PanelActivator>().DisactivePanel();

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b8a2a51b4554a45ac4949b6b1b8ea4, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  humanPlayerPrefab: {fileID: 514838801067783388, guid: 09da058c62e0e844d9c67161858648d9, type: 3}
+  botPlayerPrefab: {fileID: 5277262014233312679, guid: 3cb92c568284e17458d4ba72122fef94, type: 3}
+  networkHumanPlayerPrefab: {fileID: 5861147647111831992, guid: e7d1c1c7d390e054e9cde280824a30a0, type: 3}
+  whiteCamera: {fileID: 3385419370793408827, guid: a15f9939fd7097f4c94a3f4275189a3c, type: 3}
+  blackCamera: {fileID: 5681931649373759486, guid: 55fdc00615e3cb640881a8670b5a2d02, type: 3}

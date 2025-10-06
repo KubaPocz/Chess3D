@@ -1,3 +1,4 @@
+using Game;
 using Game.Board;
 using Game.Logic;
 using Game.Pieces;

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Core.Boot;
 using Core.Interfaces;
 using Core.Utilities;
+using Game;
 using Game.Board;
 using Game.Pieces;
 using UnityEngine;
@@ -9,7 +11,8 @@ namespace PlayerControllers
 {
     public class HumanPlayerController : MonoBehaviour, IPlayerController
     {
-        public ChessColor PlayerColor { get; private set; }
+        public ChessColor PlayerColor;
+        [SerializeField] GameConfig gameConfig;
         public void StartTurn()
         {
             enabled = true;
@@ -22,6 +25,7 @@ namespace PlayerControllers
         public void Initialize(ChessColor playerColor)
         {
             PlayerColor = playerColor;
+            Instantiate(PlayerColor == ChessColor.White ? gameConfig.whiteCamera : gameConfig.blackCamera);
         }
         void OnEnable()
         {

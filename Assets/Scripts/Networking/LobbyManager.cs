@@ -1,10 +1,14 @@
 // asmdef: Game.Networking
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Boot;
 using Core.Config;
+using Core.Settings;
 using Core.Utilities;
+using Game;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -30,7 +34,7 @@ namespace Networking
             await UnityServices.InitializeAsync();
             if (!AuthenticationService.Instance.IsSignedIn)
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            GameConfigStore.CurrentConfig = new GameConfig(GameMode.HumanVsHuman, ChessColor.White);
+            GameSettingsStore.CurrentSettings = new GameSettings(GameMode.HumanVsHuman, ChessColor.White);
         }
 
         void OnEnable()
@@ -180,7 +184,7 @@ namespace Networking
             {
                 Debug.Log($"[LobbyManager.StartGameOnline] executing at t={Time.time}");
                 string joinCode = await GameEvents.RequestHostAllocateRelayAsync(1);
-                GameConfigStore.CurrentConfig.PlayerColor = OnlineSessionCoordinator.Instance.hostColor;
+                GameSettingsStore.CurrentSettings.HostColor = OnlineSessionCoordinator.Instance.hostColor;
                 if (string.IsNullOrEmpty(joinCode))
                 {
                     GameEvents.NotifyError("Nie uda�o si� przygotowa� sesji sieciowej (Relay).");
@@ -211,6 +215,7 @@ namespace Networking
             try
             {
                 _heartbeatCts?.Cancel();
+
                 if (!string.IsNullOrEmpty(_lobbyId))
                 {
                     if (_isHost)
@@ -234,10 +239,25 @@ namespace Networking
                 _isHost = false;
                 _lobbyId = null;
                 _currentLobby = null;
+
                 if (_lobbyEvents != null)
                 {
-                    await _lobbyEvents.UnsubscribeAsync();
-                    _lobbyEvents = null;
+                    try
+                    {
+                        await _lobbyEvents.UnsubscribeAsync();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        Debug.LogWarning("Tried to unsubscribe from a disposed lobby (already cleaned up).");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Unexpected error unsubscribing: {ex}");
+                    }
+                    finally
+                    {
+                        _lobbyEvents = null;
+                    }
                 }
             }
         }
@@ -283,7 +303,7 @@ namespace Networking
                 _currentLobby.Data.TryGetValue(KeyJoincode, out var jcObj) &&
                 !string.IsNullOrEmpty(jcObj.Value))
             {
-                // Popro� koordynatora sieci o JoinRelay + StartClient
+                // Popros koordynatora sieci o JoinRelay + StartClient
                 _ = GameEvents.RequestClientJoinRelayAsync(jcObj.Value);
             }
         }

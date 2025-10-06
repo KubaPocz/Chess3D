@@ -1,5 +1,7 @@
 using Core.Config;
+using Core.Settings;
 using Core.Utilities;
+using Game;
 using Game.Logic;
 using TMPro;
 using UnityEngine;
@@ -55,14 +57,14 @@ namespace UI.Logic
         }
         void BootLabels()
         {
-            if (GameConfigStore.CurrentConfig.PlayerColor == GameStats.Instance.CurrentTurnColor)
+            if (GameSettingsStore.CurrentSettings.HostColor == GameStats.Instance.CurrentTurnColor)
                 TurnLabel.text = "Player Turn";
             else
                 TurnLabel.text = "Bot Turn";
             MovesLabel.text = 0.ToString();
             CapturedLabel.text = 0.ToString();
             string difficulty;
-            int value = GameConfigStore.CurrentConfig.Difficulty;
+            int value = GameSettingsStore.CurrentSettings.Difficulty;
             if (value <= 2) difficulty = "Very Easy";
             else if (value <= 4) difficulty = "Easy";
             else if (value <= 7) difficulty = "Medium";
@@ -76,14 +78,14 @@ namespace UI.Logic
         }
         void UpdateTurnLabel()
         {
-            if (GameConfigStore.CurrentConfig.PlayerColor == GameStats.Instance.CurrentTurnColor)
+            if (GameSettingsStore.CurrentSettings.HostColor == GameStats.Instance.CurrentTurnColor)
                 TurnLabel.text = "Player Turn";
             else
                 TurnLabel.text = "Bot Turn";
         }
         void UpdateMovesCountLabel()
         {
-            if (GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White)
+            if (GameSettingsStore.CurrentSettings.HostColor == ChessColor.White)
                 MovesLabel.text = GameStats.Instance.WhiteMoves.ToString();
             else
                 MovesLabel.text = GameStats.Instance.BlackMoves.ToString();
@@ -95,7 +97,7 @@ namespace UI.Logic
         }
         void RestartGame()
         {
-            GameEvents.RequestStartGameOffline(GameConfigStore.CurrentConfig.PlayerColor, GameConfigStore.CurrentConfig.Difficulty);
+            GameEvents.RequestStartGameOffline(GameSettingsStore.CurrentSettings.HostColor, GameSettingsStore.CurrentSettings.Difficulty);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -5,7 +6,10 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using Core.Boot;
+using Core.Settings;
 using Core.Utilities;
+using Game;
 using Game.Logic;
 
 namespace Networking
@@ -14,7 +18,8 @@ namespace Networking
     {
         public static OnlineSessionCoordinator Instance { get; private set; }
         [SerializeField] UnityTransport transport;
-        [SerializeField] string gameSceneName = "Game";
+        [SerializeField] string gameSceneName = "GameBoard";
+        [SerializeField] public GameConfig gameConfig;
         public ChessColor hostColor;
 
         void Awake()
@@ -36,6 +41,9 @@ namespace Networking
 
             GameEvents.OnMovePieceOnlineRequested += MovePieceServerRpc;
             GameEvents.OnRefreshBoardVisualsOnline += RefreshBoardVisualsClientRpc;
+            
+            GameEvents.OnNetworkPlayerPrefabSpawnRequested  += SpawnNetworkPlayerPrefab;
+
         }
 
         void OnDisable()
@@ -45,6 +53,8 @@ namespace Networking
 
             GameEvents.OnMovePieceOnlineRequested -= MovePieceServerRpc;
             GameEvents.OnRefreshBoardVisualsOnline -= RefreshBoardVisualsClientRpc;
+            
+            GameEvents.OnNetworkPlayerPrefabSpawnRequested  -= SpawnNetworkPlayerPrefab;
         }
 
         async Task<string> OnHostAllocateRelayRequested(int expectedClients)
@@ -64,7 +74,7 @@ namespace Networking
 
                 return joinCode;
             }
-            catch (System.Exception ex)
+            catch ( Exception ex)
             {
                 Debug.LogError("Host allocate/start failed: " + ex.Message);
                 return null;
@@ -82,7 +92,7 @@ namespace Networking
                 if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
                     NetworkManager.Singleton.StartClient();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Debug.LogError("Client join failed: " + ex.Message);
             }
@@ -98,6 +108,16 @@ namespace Networking
         public void RefreshBoardVisualsClientRpc()
         {
             BoardManager.Instance.RefreshBoardVisuals();
+        }
+        
+        void SpawnNetworkPlayerPrefab()
+        {
+            Instantiate(gameConfig.networkHumanPlayerPrefab)
+                .GetComponent<NetworkPlayerController>()
+                    .Initialize(IsHost
+                        ? GameSettingsStore.CurrentSettings.HostColor
+                        : GameSettingsStore.CurrentSettings.ClientColor);
+            Debug.Log($"IsServer={IsServer}, IsClient={IsClient}, IsHost={IsHost}, LocalClientId={NetworkManager.Singleton.LocalClientId}");
         }
     }
 }

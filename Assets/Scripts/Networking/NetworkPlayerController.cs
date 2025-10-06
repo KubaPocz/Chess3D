@@ -1,39 +1,30 @@
-using System;
 using System.Collections.Generic;
-using Core.Config;
 using Core.Interfaces;
 using Core.Utilities;
+using Game;
 using Game.Board;
 using Game.Boot;
 using Game.Pieces;
-using Unity.Netcode;
+using UnityEngine;
 
 namespace Networking
 {
-    public class NetworkPlayerController : NetworkBehaviour, IPlayerController
+    public class NetworkPlayerController : MonoBehaviour,IPlayerController
     {
-        public NetworkVariable<ChessColor> PlayerColor = new NetworkVariable<ChessColor>();
-        public override void OnNetworkSpawn()
-        {
-            if (IsServer)
-            {
-                if (OwnerClientId == NetworkManager.ServerClientId)
-                {
-                    PlayerColor.Value = GameConfigStore.CurrentConfig.PlayerColor;
-                }
-                else
-                {
-                    PlayerColor.Value = GameConfigStore.CurrentConfig.PlayerColor == ChessColor.White
-                        ? ChessColor.Black
-                        : ChessColor.White;
-                }
-            }
+        public ChessColor PlayerColor;
 
+        public void Start()
+        {
             GameSetupManager.Instance.RegisterPlayer(this);
         }
         public void Initialize(ChessColor playerColor)
         {
-            PlayerColor.Value = playerColor;
+            PlayerColor = playerColor;
+            Instantiate(PlayerColor == ChessColor.White
+                ? OnlineSessionCoordinator.Instance.gameConfig.whiteCamera
+                : OnlineSessionCoordinator.Instance.gameConfig.blackCamera);
+            if (PlayerColor == ChessColor.Black)
+                gameObject.SetActive(false);
         }
         void OnEnable()
         {

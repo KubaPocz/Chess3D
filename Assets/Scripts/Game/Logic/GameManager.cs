@@ -1,6 +1,7 @@
 ﻿using Core.Boot;
 using Core.Config;
 using Core.Interfaces;
+using Core.Settings;
 using Core.Utilities;
 using Game.Boot;
 using Game.Pieces;
@@ -38,7 +39,7 @@ namespace Game.Logic
 
             GameEvents.OnMovePieceOfflineRequested += MovePiece;
 
-            if (GameConfigStore.CurrentConfig.GameMode == GameMode.HumanVsBot)
+            if (GameSettingsStore.CurrentSettings.GameMode == GameMode.HumanVsBot)
             {
                 InitPlayersAndStart();
             }
@@ -64,7 +65,7 @@ namespace Game.Logic
         {
             var setup = GameSetupManager.Instance;
 
-            ChessColor player1Color = GameConfigStore.CurrentConfig.PlayerColor;
+            ChessColor player1Color = GameSettingsStore.CurrentSettings.HostColor;
             if (player1Color == ChessColor.White)
                 AssignPlayers(setup.Player1, setup.Player2);
             else

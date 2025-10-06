@@ -1,4 +1,5 @@
 using Core.Config;
+using Core.Settings;
 using Core.Utilities;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace Game.Logic
             CurrentTurnColor = ChessColor.White;
             WhiteMoves = 0;
             BlackMoves = 0;
-            if(GameConfigStore.CurrentConfig.GameMode == GameMode.HumanVsHuman)
+            if(GameSettingsStore.CurrentSettings.GameMode == GameMode.HumanVsHuman)
             {
                 //do ewentualnej zmiany w ustawieniach gry w lobby
                 WhiteTime = 15f;

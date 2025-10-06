@@ -2,7 +2,9 @@ using System.Collections;
 using AI;
 using Core.Config;
 using Core.Interfaces;
+using Core.Settings;
 using Core.Utilities;
+using Game;
 using Game.Logic;
 using UnityEngine;
 
@@ -31,7 +33,7 @@ namespace PlayerControllers
             PlayerColor = playerColor;
             _stockfish = new StockfishEngine();
             _stockfish.StartEngine();
-            _stockfish.SetSkillLevel(GameConfigStore.CurrentConfig.Difficulty);
+            _stockfish.SetSkillLevel(GameSettingsStore.CurrentSettings.Difficulty);
         }
         IEnumerator ApplyMove(string uci)
         {
